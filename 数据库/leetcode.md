@@ -103,11 +103,11 @@ FROM Person P
 
 ```sql
 SELECT (
-		SELECT DISTINCT Salary
-		FROM Employee
-		ORDER BY Salary DESC
-		LIMIT 1, 1
-	) AS SecondHighestSalary;
+    SELECT DISTINCT Salary
+    FROM Employee
+    ORDER BY Salary DESC
+    LIMIT 1, 1
+) AS SecondHighestSalary;
 ```
 
 
@@ -194,8 +194,8 @@ END
 #### Solution:
 
 ```sql
-SELECT Score
-	, (
+SELECT Score,
+	(
 		SELECT COUNT(DISTINCT Score)
 		FROM Scores
 		WHERE Score >= s.Score
