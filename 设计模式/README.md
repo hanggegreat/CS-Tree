@@ -107,7 +107,7 @@
 
 ###### UML：
 
-![](F:\Java-Note\设计模式\picture\adapter.png)
+![](picture/adapter.png)
 
 ##### 实现：
 
