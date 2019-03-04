@@ -4,7 +4,7 @@
 
 ### 开闭原则
 
-开闭原则是面向对象的可复用设计的第一块基石，它是最重要的面向对象设计原则。开闭原则由Bertrand  Meyer于1988年提出，其定义如下：
+[开闭原则](./src/main/java/cn.lollipop/design/principle/openclose)是面向对象的可复用设计的第一块基石，它是最重要的面向对象设计原则。开闭原则由Bertrand  Meyer于1988年提出，其定义如下：
 
 > 开闭原则(Open-Closed Principle)：一个软件实体应当对扩展开放，对修改关闭。即软件实体应尽量在不修改原有代码的情况下进行扩展。
 
@@ -14,15 +14,13 @@
 
 为了满足开闭原则，需要对系统进行抽象化设计，抽象化是开闭原则的关键。在Java、C#等编程语言中，可以为系统定义一个相对稳定的抽象层，而将不同的实现行为移至具体的实现层中完成。在很多面向对象编程语言中都提供了接口、抽象类等机制，可以通过它们定义系统的抽象层，再通过具体类来进行扩展。如果需要修改系统的行为，无须对抽象层进行任何改动，只需要增加新的具体类来实现新的业务功能即可，实现在不修改已有代码的基础上扩展系统的功能，达到开闭原则的要求。
 
-[openclose](design.principle.openclose)
-
 ![](picture/openclose.png)
 
 
 
 ### 依赖倒置原则
 
-**依赖倒置原则(Dependence Inversion Principle ,DIP)定义如下：**
+**[依赖倒置原则](./src/main/java/cn.lollipop/design/principle/dependenceinverse)原则(Dependence Inversion Principle ,DIP)定义如下：**
 
 > 高层模块不应该依赖低层模块，两者都应该依赖抽象
 > 抽象不应该依赖细节
@@ -40,8 +38,6 @@
 
 **更加精简的定义就是“面向接口编程”—OOD(Object-Oriented Design，面向对象设计)的精髓之一。**
 
-具体demo参见**cn.lollipop.design.principle.dependenceinverse**包
-
 ![](picture/dependenceinverse.png)
 
 
@@ -50,12 +46,10 @@
 
 > 单一职责原则(SRP:Single responsibility principle)又称单一功能原则，面向对象五个基本原则(SOLID)之一。它规定一个类应该只有一个发生变化的原因。
 
-**单一职责原则是最简单的面对对象设计原则，它用于控制类的粒度大小。**
+**[单一职责原则](./src/main/java/cn.lollipop/design/principle/singleresponsibility)原则是最简单的面对对象设计原则，它用于控制类的粒度大小。**
 在软件系统中，一个类（大到模块，小到方法）承担的职责越多，它被复用的可能性就越小，而且一个类承担的职责过多，就相当于将这些职责耦合在一起，当其中一个职责变化时，可能会影响其他职责的运作，因此要将这些职责进行分离，将不同的职责封装在不同的类中，即将不同的变化原因封装在不同的类中，如果多个职责总是同时发生改变则可将它们封装在同一类中。
 
 我们写程序的目标就是 高内聚 低耦合!什么叫高内聚低耦合呢，举个例子：你房子里边有墙和窗 ，那墙和窗就有了关联，耦合度 是松还是紧 就看你的 关联 是强还是弱，也就是修改的代价，比如 你窗是扣死在墙里的 那么你修改窗子就必须修改墙 这就比较紧密了，但是如果你窗是按照某种规格的 可以自由拆装的 那么修改的代价就小，耦合度也就低了。
-
-具体demo参见**cn.lollipop.design.principle.singleresponsibility**包
 
 
 
@@ -89,8 +83,6 @@
    接口的设计粒度越小，系统越灵活，这是不争的事实。但是，灵活的同时也带来了结构的复杂化，开发难度增加，可维护性降低，这不是一个项目或产品所期望看到的，所以接口设计一定要注意适度，这个度只能根据经验和常识判断，没有一个固化或可测量的标准。
 
 
-
-具体demo参见**cn.lollipop.design.principle.interfacesegregation**包
 
 ![](picture/interfacesegregation.png)
 
