@@ -109,7 +109,7 @@
 
 ![](picture/adapter.png)
 
-##### 实现：
+###### 实现：
 
 将Adaptee类的request()方法适配成Target接口的handleRequest()方法
 
