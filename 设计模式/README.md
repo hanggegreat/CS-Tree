@@ -1,10 +1,10 @@
-# 设计模式学习
+# 未整理完毕
 
-## 设计模式原则
+## 设计原则
 
 ### 开闭原则
 
-[开闭原则](./src/main/java/cn.lollipop/design/principle/openclose)是面向对象的可复用设计的第一块基石，它是最重要的面向对象设计原则。开闭原则由Bertrand  Meyer于1988年提出，其定义如下：
+[开闭原则](./src/main/java/cn/lollipop/design/principle/openclose)是面向对象的可复用设计的第一块基石，它是最重要的面向对象设计原则。开闭原则由Bertrand  Meyer于1988年提出，其定义如下：
 
 > 开闭原则(Open-Closed Principle)：一个软件实体应当对扩展开放，对修改关闭。即软件实体应尽量在不修改原有代码的情况下进行扩展。
 
@@ -20,7 +20,7 @@
 
 ### 依赖倒置原则
 
-**[依赖倒置原则](./src/main/java/cn.lollipop/design/principle/dependenceinverse)原则(Dependence Inversion Principle ,DIP)定义如下：**
+**[依赖倒置原则](./src/main/java/cn/lollipop/design/principle/dependenceinverse)原则(Dependence Inversion Principle ,DIP)定义如下：**
 
 > 高层模块不应该依赖低层模块，两者都应该依赖抽象
 > 抽象不应该依赖细节
@@ -46,7 +46,7 @@
 
 > 单一职责原则(SRP:Single responsibility principle)又称单一功能原则，面向对象五个基本原则(SOLID)之一。它规定一个类应该只有一个发生变化的原因。
 
-**[单一职责原则](./src/main/java/cn.lollipop/design/principle/singleresponsibility)原则是最简单的面对对象设计原则，它用于控制类的粒度大小。**
+**[单一职责原则](./src/main/java/cn/lollipop/design/principle/singleresponsibility)原则是最简单的面对对象设计原则，它用于控制类的粒度大小。**
 在软件系统中，一个类（大到模块，小到方法）承担的职责越多，它被复用的可能性就越小，而且一个类承担的职责过多，就相当于将这些职责耦合在一起，当其中一个职责变化时，可能会影响其他职责的运作，因此要将这些职责进行分离，将不同的职责封装在不同的类中，即将不同的变化原因封装在不同的类中，如果多个职责总是同时发生改变则可将它们封装在同一类中。
 
 我们写程序的目标就是 高内聚 低耦合!什么叫高内聚低耦合呢，举个例子：你房子里边有墙和窗 ，那墙和窗就有了关联，耦合度 是松还是紧 就看你的 关联 是强还是弱，也就是修改的代价，比如 你窗是扣死在墙里的 那么你修改窗子就必须修改墙 这就比较紧密了，但是如果你窗是按照某种规格的 可以自由拆装的 那么修改的代价就小，耦合度也就低了。
@@ -94,4 +94,89 @@
 
 问题由来：类与类之间的关系越密切，耦合度越大，当一个类发生改变时，对另一个类的影响也越大
 一个对象应该对其他对象有最少的了解。通俗地讲，一个类应该对自己需要耦合或调用的类知道得最少，你（被耦合或调用的类）的内部是如何复杂都和我没关系，那是你的事情，我就知道你提供的public方法，我就调用这么多，其他的一概不关心
+
+
+
+## 设计模式
+
+### [适配器模式](./src/main/java/cn/lollipop/design/mode/adapter)
+
+适配器模式：将一个类的接口转换成客户希望的另一个接口。适配器模式让那些接口不兼容的类可以一起工作
+
+　　适配器模式的别名为包装器(Wrapper)模式，它既可以作为类结构型模式，也可以作为对象结构型模式。在适配器模式定义中所提及的接口是指广义的接口，它可以表示一个方法或者方法的集合。
+
+###### UML：
+
+![](F:\Java-Note\设计模式\picture\adapter.png)
+
+##### 实现：
+
+将Adaptee类的request()方法适配成Target接口的handleRequest()方法
+
+```java
+/**
+ * 被适配的类
+ */
+public class Adaptee {
+
+    public void request() {
+        System.out.println("可以完成客户请求需要的功能");
+    }
+}
+
+```
+
+```java
+/**
+ * 希望的接口
+ */
+public interface Target {
+
+    void handleRequest();
+}
+
+```
+
+```java
+/**
+ * 适配器
+ */
+public class Adapter implements Target {
+    private final Adaptee adaptee;
+
+    public Adapter(Adaptee adaptee) {
+        this.adaptee = adaptee;
+    }
+
+    @Override
+    public void handleRequest() {
+        adaptee.request();
+    }
+}
+
+```
+
+```java
+/**
+ * 适配器模式
+ * 客户端类
+ */
+public class Client {
+
+    public void test(Target t) {
+        t.handleRequest();
+    }
+
+    public static void main(String[] args) {
+        Client client = new Client();
+        Adaptee adaptee = new Adaptee();
+        Adapter adapter = new Adapter(adaptee);
+        client.test(adapter);
+    }
+}
+```
+
+###### 输出:
+
+> 可以完成客户请求需要的功能
 
