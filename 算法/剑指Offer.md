@@ -1299,3 +1299,56 @@ public class Solution {
 }
 ```
 
+### 33.丑数
+
+#### 题目描述
+
+把只包含质因子2、3和5的数称作丑数（Ugly Number）。例如6、8都是丑数，但14不是，因为它包含质因子7。 习惯上我们把1当做是第一个丑数。求按从小到大的顺序的第N个丑数。
+
+#### Solution:
+
+```java
+public class Solution {
+    public int GetUglyNumber_Solution(int index) {
+        if (index < 7) { // 前6个丑数为其自身
+            return index;
+        }
+
+        int[] array = new int[index + 1];
+        array[0] = 1;
+        //i2，i3，i5分别为三个队列的指针
+        int i2 = 0;
+        int i3 = 0;
+        int i5 = 0;
+        for (int i = 1; i < array.length; i++) {
+            //选出三个队列头最小的数
+            array[i] = Math.min(Math.min(array[i2] * 2, array[i3] * 3), array[i5] * 5);
+            //这三个if有可能进入一个或者多个，进入多个是三个队列头最小的数有多个的情况
+            if (array[i] == array[i2] * 2) {
+                i2++;
+            }
+            if (array[i] == array[i3] * 3) {
+                i3++;
+            }
+            if (array[i] == array[i5] * 5) {
+                i5++;
+            }
+        }
+
+        return array[index - 1];
+    }
+}
+```
+
+### 34.第一个只出现一次的字符
+
+#### 题目描述
+
+在一个字符串(0<=字符串长度<=10000，全部由字母组成)中找到第一个只出现一次的字符,并返回它的位置, 如果没有则返回 -1（需要区分大小写）.
+
+#### Solution:
+
+```java
+
+```
+
