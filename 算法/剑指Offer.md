@@ -1241,10 +1241,61 @@ public class Solution {
 
 #### 题目描述
 
-求出1-13的整数中1出现的次数,并算出100~1300的整数中1出现的次数？为此他特别数了一下1~13中包含1的数字有1、10、11、12、13因此共出现6次,但是对于后面问题他就没辙了。ACMer希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
+求出1-13的整数中1出现的次数,并算出100-1300的整数中1出现的次数？为此他特别数了一下1-13中包含1的数字有1、10、11、12、13因此共出现6次,但是对于后面问题他就没辙了。ACMer希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
 
 #### Solution:
 
+```java
+public class Solution {
+    public int NumberOf1Between1AndN_Solution(int n) {
+        if (n <= 0) {
+            return 0;
+        }
+        
+        int count = 0;
+        for (int i = 1; i <= n && i > 0; i *= 10) {
+            int a = n / i; // 表示i位置及前面的数
+            int b = n % i; // 表示i位置后面的数
+            if (a % 10 == 0) {// i位置为0，则i位置为1有(a / 10) * i种可能
+                count += (a / 10) * i;
+            } else if (a % 10 == 1) {// i位置为1，则i位置为1有(a / 10) * i + b + 1种可能
+                count += (a / 10) * i + b + 1;
+            } else {// i位置为2 - 9，则i位置为1有(a /10 + 1) * i种可能
+                count += (a /10 + 1) * i;
+            }
+        }
+        
+        return count;
+    }
+}
+```
 
+### 32.把数组排成最小的数
 
-  `
+#### 题目描述
+
+输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
+
+#### Solution:
+
+```java
+/**
+* 转化为流处理，将数字转化为字符串，然后比较s1 + s2 与 s2 + s1的大小，进行排序，再拼接为字符串即可
+*/
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Solution {
+    public String PrintMinNumber(int[] numbers) {
+        if (numbers == null || numbers.length == 0) {
+            return "";
+        }
+
+        return Arrays.stream(numbers)
+                .mapToObj(String::valueOf)
+                .sorted((s1, s2) -> (s1 + s2).compareTo(s2 + s1))
+                .collect(Collectors.joining());
+    }
+}
+```
+
