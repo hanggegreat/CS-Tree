@@ -33,7 +33,15 @@
 - [30.连续子数组的最大和](#30连续子数组的最大和)
 - [31.整数中1出现的次数](#31整数中1出现的次数)
 - [32.把数组排成最小的数](#32把数组排成最小的数)
-- 
+- [33.丑数](#32丑数)
+- [34.第一个只出现一次的字符](#34第一个只出现一次的字符)
+- [35.35数组中的逆序对](#35数组中的逆序对)
+- [36.两个链表的第一个公共结点](#36两个链表的第一个公共结点)
+- [37.数字在排序数组中出现的次数](#37数字在排序数组中出现的次数)
+- [38.二叉树的深度](#38二叉树的深度)
+- [39.平衡二叉树](#39平衡二叉树)
+- [40.数组中只出现一次的数字](#40数组中只出现一次的数字)
+- [41.和为S的连续正数序列](#41和为S的连续正数序列)
 
 ### 1.二维数组中的查找
 
@@ -1349,6 +1357,337 @@ public class Solution {
 #### Solution:
 
 ```java
+import java.util.*;
 
+public class Solution {
+    public int FirstNotRepeatingChar(String str) {
+        if (str == null || str.length() < 1) {
+            return -1;
+        }
+        
+        Map<Character, Integer> map = new HashMap<>();
+        for (int i = 0; i < str.length(); i++) {
+            map.put(str.charAt(i), map.getOrDefault(str.charAt(i), 0) + 1);
+        }
+        for (int i = 0; i < str.length(); i++) {
+            if (map.get(str.charAt(i)) == 1) {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
+}
+```
+
+### 35.数组中的逆序对
+
+#### 题目描述
+
+在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组,求出这个数组中的逆序对的总数P。并将P对1000000007取模的结果输出。 即输出P%1000000007
+
+#### 输入描述:
+
+```html
+题目保证输入的数组中没有的相同的数字
+数据范围：
+	对于50%的数据,size<=10^4
+	对于75%的数据,size<=10^5
+	对于100%的数据,size<=2*10^5
+```
+
+示例1
+
+#### 输入
+
+复制
+
+```html
+1,2,3,4,5,6,7,0
+```
+
+#### 输出
+
+复制
+
+```html
+7
+```
+
+#### Solution:
+
+```java
+public class Solution {
+    private int res = 0;
+    private int[] temp;
+    
+    public int InversePairs(int [] array) {
+        if (array == null || array.length < 2) {
+            return 0;
+        }
+        
+        temp = new int[array.length];
+        mergeSortAndCalc(array, 0, array.length - 1);
+        return res;
+    }
+    
+    // 归并排序
+    private void mergeSortAndCalc(int[] array, int start, int end) {
+        if (start >= end) {
+            return;
+        }
+        
+        int mid = start + ((end - start) >> 1);
+        mergeSortAndCalc(array, start, mid);
+        mergeSortAndCalc(array, mid + 1, end);
+        
+        merge(array, start, mid, end);
+    }
+    
+    // 将一个数组中的两个相邻有序区间合并成一个
+    private void merge(int array[], int start, int mid, int end) {
+        int i = start, j = mid + 1, k = 0;
+        while (i <= mid && j <= end) {
+            if (array[i] <= array[j]) {
+                temp[k++] = array[i++];
+            } else {
+                temp[k++] = array[j++];
+                res += mid - i + 1;
+                res %= 1000000007;
+            }
+        }
+        while (i <= mid) {
+            temp[k++] = array[i++];
+        }
+        while (j <= end) {
+            temp[k++] = array[j++];
+        }
+        for(int m = 0; m < k; m++) {
+            array[m + start] = temp[m];
+        }
+    }
+}
+```
+
+### 36.两个链表的第一个公共结点
+
+#### 题目描述
+
+输入两个链表，找出它们的第一个公共结点。
+
+#### Solution:
+
+```java
+import java.util.*;
+
+public class Solution {
+    public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
+        Set<ListNode> set = new HashSet<>();
+        
+        ListNode node1 = pHead1;
+        ListNode node2 = pHead2;
+        while (node1 != null) {
+            set.add(node1);
+            node1 = node1.next;
+        }
+        while (node2 != null) {
+            if (set.contains(node2)) {
+                return node2;
+            }
+            
+            node2 = node2.next;
+        }
+        return null;
+    }
+}
+```
+
+### 37.数字在排序数组中出现的次数
+
+#### 题目描述
+
+统计一个数字在排序数组中出现的次数。
+
+#### Solution:
+
+```java
+// 因为data中都是整数，所以可以稍微变一下，不是搜索k的两个位置，而是搜索k-0.5和k+0.5这两个数应该插入的位置，然后相减即可。
+
+public class Solution {
+    public int GetNumberOfK(int[] array, int k) {
+        if (array == null || array.length == 0) {
+            return 0;
+        }
+        return binarySearch(array, k + 0.5) - binarySearch(array, k - 0.5);
+    }
+    
+    private int binarySearch(int[] array, double k) {
+        int left = 0;
+        int right = array.length - 1;
+        
+        while (right >= left) {
+            int mid = left + ((right - left) >> 1);
+            if (array[mid] > k) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }
+}
+```
+
+### 38.二叉树的深度
+
+#### 题目描述
+
+输入一棵二叉树，求该树的深度。从根结点到叶结点依次经过的结点（含根、叶结点）形成树的一条路径，最长路径的长度为树的深度。
+
+结点定义如下：
+
+```java
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+    TreeNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
+```java
+public class Solution {
+    public int TreeDepth(TreeNode root) {
+        return root == null ? 0
+            : 1 + Math.max(TreeDepth(root.left), TreeDepth(root.right));
+    }
+}
+```
+
+### 39.平衡二叉树
+
+#### 题目描述
+
+输入一棵二叉树，判断该二叉树是否是平衡二叉树。
+
+结点定义如下：
+
+```java
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+    TreeNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
+```java
+public class Solution {
+    private boolean flag = true;
+    
+    public boolean IsBalanced_Solution(TreeNode root) {
+        height(root);
+        return flag;
+    }
+    
+    private int height(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        
+        int left = height(root.left);
+        int right = height(root.right);
+        if (Math.abs(left - right) > 1) {
+            flag = false;
+        }
+        return Math.max(left, right) + 1;
+    }
+}
+```
+
+### 40.数组中只出现一次的数字
+
+#### 题目描述
+
+一个整型数组里除了两个数字之外，其他的数字都出现了偶数次。请写程序找出这两个只出现一次的数字。
+
+#### Solution:
+
+```java
+import java.util.*;
+
+//num1,num2分别为长度为1的数组。传出参数
+//将num1[0],num2[0]设置为返回结果
+public class Solution {
+    public void FindNumsAppearOnce(int[] array, int num1[], int num2[]) {
+        Set<Integer> set = new HashSet<>();
+        for (int num : array) {
+            if (set.contains(num)) {
+                set.remove(num);
+            } else {
+                set.add(num);
+            }
+        }
+        Object[] elements = set.toArray();
+        num1[0] = (Integer) elements[0];
+        num2[0] = (Integer) elements[1];
+    }
+}
+```
+
+### 41.和为S的连续正数序列
+
+#### 题目描述
+
+小明很喜欢数学,有一天他在做数学作业时,要求计算出9~16的和,他马上就写出了正确答案是100。但是他并不满足于此,他在想究竟有多少种连续的正数序列的和为100(至少包括两个数)。没多久,他就得到另一组连续正数和为100的序列:18,19,20,21,22。现在把问题交给你,你能不能也很快的找出所有和为S的连续正数序列? Good Luck!
+
+#### 输出描述:
+
+```html
+输出所有和为S的连续正数序列。序列内按照从小至大的顺序，序列间按照开始数字从小到大的顺序
+```
+
+#### Solution:
+
+```java
+import java.util.ArrayList;
+    
+public class Solution {
+    public ArrayList<ArrayList<Integer>> FindContinuousSequence(int sum) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        int left = 1;
+        int right = 2;
+        int curSum = 3;
+        
+        while (right < sum) {
+            if (curSum < sum) {
+                right++;
+                curSum += right;
+            } else if (curSum > sum) {
+                curSum -= left;
+                left++;
+            } else {
+                ArrayList<Integer> list = new ArrayList<>();
+                for (int i = left; i <= right; i++) {
+                    list.add(i);
+                }
+                res.add(list);
+                curSum -= left;
+                left++;
+                right++;
+                curSum += right;
+            }
+        }
+        return res;
+    }
+}
 ```
 
