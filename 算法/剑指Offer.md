@@ -42,6 +42,10 @@
 - [39.平衡二叉树](#39平衡二叉树)
 - [40.数组中只出现一次的数字](#40数组中只出现一次的数字)
 - [41.和为S的连续正数序列](#41和为S的连续正数序列)
+- [42.和为S的两个数字](#42和为S的两个数字)
+- [43.左旋转字符串](#43左旋转字符串)
+- [44.翻转单词顺序](#44翻转单词顺序)
+- [45.扑克牌顺子](#45扑克牌顺子)
 
 ### 1.二维数组中的查找
 
@@ -90,7 +94,7 @@ public class Solution {
 
 ```java
 /**
-* 遍历字符串，用StringBuilder拼接出新的字符串
+* 遍历字符串， 用StringBuilder拼接出新的字符串
 */
 public class Solution {
     public String replaceSpace(StringBuffer str) {
@@ -1689,5 +1693,108 @@ public class Solution {
         return res;
     }
 }
+```
+
+### 42.和为S的两个数字
+
+#### 题目描述
+
+输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。
+
+#### 输出描述:
+
+```html
+对应每个测试案例，输出两个数，小的先输出。
+```
+
+#### Solution:
+
+```java
+import java.util.ArrayList;
+
+public class Solution {
+    public ArrayList<Integer> FindNumbersWithSum(int[] array, int sum) {
+        ArrayList<Integer> res = new ArrayList<>();
+        int left = 0;
+        int right = array.length - 1;
+
+        while (left < right) {
+            if (array[left] + array[right] < sum) {
+                left++;
+            } else if (array[left] + array[right] > sum) {
+                right--;
+            } else {
+                if (res.isEmpty()
+                        || res.get(0) * res.get(1) > array[left] * array[right]) {
+                    res.clear();
+                    res.add(array[left]);
+                    res.add(array[right]);
+                }
+                left++;
+                right--;
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 43.左旋转字符串
+
+#### 题目描述
+
+汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它！
+
+#### Solution:
+
+```java
+public class Solution {
+    public String LeftRotateString(String str, int n) {
+        if (str == null || str.length() < 2) {
+            return str;
+        }
+        
+        int k = n % str.length();
+        return str.substring(k) + str.substring(0, k);
+    }
+}
+```
+
+### 44.翻转单词顺序
+
+#### 题目描述
+
+牛客最近来了一个新员工Fish，每天早晨总是会拿着一本英文杂志，写些句子在本子上。同事Cat对Fish写的内容颇感兴趣，有一天他向Fish借来翻看，但却读不懂它的意思。例如，“student. a am I”。后来才意识到，这家伙原来把句子单词的顺序翻转了，正确的句子应该是“I am a student.”。Cat对一一的翻转这些单词顺序可不在行，你能帮助他么？
+
+#### Solution:
+
+```java
+public class Solution {
+    public String ReverseSentence(String str) {
+        // str = " "的情况容易忽略
+        if (str == null || str.trim().isEmpty()) {
+            return str;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        String[] temp = str.split(" ");
+        for (int i = temp.length - 1; i > 0; i--) {
+            sb.append(temp[i]).append(" ");
+        }
+        return sb.append(temp[0]).toString();
+    }
+}
+```
+
+### 45.扑克牌顺子
+
+#### 题目描述
+
+LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有2个大王,2个小王(一副牌原本是54张^_^)...他随机从中抽出了5张牌,想测测自己的手气,看看能不能抽到顺子,如果抽到的话,他决定去买体育彩票,嘿嘿！！“红心A,黑桃3,小王,大王,方片5”,“Oh My God!”不是顺子.....LL不高兴了,他想了想,决定大\小 王可以看成任何数字,并且A看作1,J为11,Q为12,K为13。上面的5张牌就可以变成“1,2,3,4,5”(大小王分别看作2和4),“So Lucky!”。LL决定去买体育彩票啦。 现在,要求你使用这幅牌模拟上面的过程,然后告诉我们LL的运气如何， 如果牌能组成顺子就输出true，否则就输出false。为了方便起见,你可以认为大小王是0。
+
+#### Solution:
+
+```java
+
 ```
 
