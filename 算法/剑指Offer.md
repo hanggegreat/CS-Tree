@@ -94,7 +94,7 @@ public class Solution {
 
 ```java
 /**
-* 遍历字符串， 用StringBuilder拼接出新的字符串
+* 遍历字符串，用StringBuilder拼接出新的字符串
 */
 public class Solution {
     public String replaceSpace(StringBuffer str) {
