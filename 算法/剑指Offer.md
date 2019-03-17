@@ -1795,6 +1795,30 @@ LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有2
 #### Solution:
 
 ```java
+import java.util.Arrays;
 
+public class Solution {
+    public boolean isContinuous(int [] numbers) {
+        if (numbers == null || numbers.length < 5) {
+            return false;
+        }
+        
+        Arrays.sort(numbers);
+        int count = 0;// 癞子个数
+        for (int number : numbers) {
+            if (number == 0) {
+                count++;
+            }
+        }
+        // 非0
+        for (int i = count; i < numbers.length - 1; i++) {
+            if (numbers[i + 1] == numbers[i]) {
+                return false;
+            }
+            count -= numbers[i + 1] - numbers[i] - 1;
+        }
+        return count >= 0;
+    }
+}
 ```
 
