@@ -47,6 +47,8 @@
 - [45.扑克牌顺子](#45扑克牌顺子)
 - [46.孩子们的游戏](#46孩子们的游戏)
 - [47.求1 + 2 + 3 + ... + n](#47求1 + 2 + 3 + ... + n)
+- [48.不用加减乘除做加法](#48不用加减乘除做加法)
+- [49.把字符串转换成整数](#49把字符串转换成整数)
 
 ### 1.二维数组中的查找
 
@@ -1890,6 +1892,70 @@ public class Solution {
             num1 = sum;
         }
         return num1;
+    }
+}
+```
+
+### 49.把字符串转换成整数
+
+#### 题目描述
+
+将一个字符串转换成一个整数(实现Integer.valueOf(string)的功能，但是string不符合数字要求时返回0)，要求不能使用字符串转换整数的库函数。 数值为0或者字符串不是一个合法的数值则返回0。
+
+#### 输入描述:
+
+```html
+输入一个字符串,包括数字字母符号,可以为空
+```
+
+#### 输出描述:
+
+```html
+如果是合法的数值表达则返回该数字，否则返回0
+```
+
+示例1
+
+#### 输入
+
+```html
++2147483647
+    1a33
+```
+
+#### 输出
+
+```html
+2147483647
+    0
+```
+
+#### Solution:
+
+```java
+public class Solution {
+    public int StrToInt(String str) {
+        if (str == null || "".equals(str)) {
+            return 0;
+        }
+        
+        int index = 0;
+        int flag = 1;
+        int res = 0;
+        if (str.charAt(index) == '+') {
+            index++;
+        } else if (str.charAt(index) == '-') {
+            index++;
+            flag = -1;
+        }
+        
+        while (index < str.length()) {
+            if (str.charAt(index) < '0' || str.charAt(index) > '9') {
+                return 0;
+            }
+            res = res * 10 + str.charAt(index++) - '0';
+        }
+        return flag * res;
     }
 }
 ```
