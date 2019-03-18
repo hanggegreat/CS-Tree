@@ -2165,6 +2165,19 @@ public class Solution {
 
 给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
 
+结点定义如下：
+
+```java
+public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}
+```
+
 #### Solution:
 
 ```java
@@ -2205,6 +2218,21 @@ public class Solution {
 
 在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
 
+结点定义如下：
+
+```java
+public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
 ```java
 public class Solution {
     public ListNode deleteDuplication(ListNode pHead) {
@@ -2226,6 +2254,293 @@ public class Solution {
             }
         }
         return dummy.next;
+    }
+}
+```
+
+### 57.二叉树的下一个结点
+
+#### 题目描述
+
+给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
+
+结点定义如下：
+
+```java
+public class TreeLinkNode {
+    int val;
+    TreeLinkNode left = null;
+    TreeLinkNode right = null;
+    TreeLinkNode next = null;
+
+    TreeLinkNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
+```java
+public class Solution {
+    public TreeLinkNode GetNext(TreeLinkNode pNode) {
+        if (pNode == null) {
+            return null;
+        }
+        // 右节点不为空，说明下一个结点在右子树，只需在右子树往左下沉
+        if (pNode.right != null) {
+            pNode = pNode.right;
+            while (pNode.left != null) {
+                pNode = pNode.left;
+            }
+            return pNode;
+        }
+        // 右节点为空，说明向下一个结点是所在左子树的父节点或所在右子树的父节点的父节点
+        // 但是不管怎样，只要向上回溯，找到第一个父节点的左节点为当前节点的节点即可，其父节点就是要找的中序遍历下一个节点
+        while (pNode.next != null) {
+            if (pNode.next.left == pNode) {
+                return pNode.next;
+            }
+            pNode = pNode.next;
+        }
+        return null;
+    }
+}
+```
+
+### 58.对称的二叉树
+
+#### 题目描述
+
+请实现一个函数，用来判断一颗二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
+
+结点定义如下：
+
+```java
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
+```java
+public class Solution {
+    public boolean isSymmetrical(TreeNode pRoot) {
+        if (pRoot == null) {
+            return true;
+        }
+        return isSymmetrical(pRoot.left, pRoot.right);
+    }
+    
+    private boolean isSymmetrical(TreeNode left, TreeNode right) {
+        if (left == null && right == null) {
+            return true;
+        }
+        if (left == null || right == null || left.val != right.val) {
+            return false;
+        }
+        return isSymmetrical(left.left, right.right) && isSymmetrical(left.right, right.left);
+    }
+}
+```
+
+### 59.按之字形顺序打印二叉树
+
+#### 题目描述
+
+请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
+
+结点定义如下：
+
+```java
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
+```java
+/**
+ * 使用双向队列保存每一层的节点
+ * 奇数层从头部取节点，采用尾插法保存，
+ * 偶数层从尾部取节点，采用头插法保存
+ */
+public class Solution {
+    public ArrayList<ArrayList<Integer>> Print(TreeNode pRoot) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        if (pRoot == null) {
+            return res;
+        }
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        TreeNode node = pRoot;
+        int count = 1;
+        int level = 1;
+        queue.offerFirst(node);
+        while (!queue.isEmpty()) {
+            int size = 0;
+            ArrayList<Integer> list = new ArrayList<>();
+            while (count-- > 0) {
+                if ((level & 1) == 1) { // 奇数层，从左到右打印
+                    node = queue.pollFirst();
+                    if (node.left != null) {
+                        queue.offerLast(node.left);
+                        size++;
+                    }
+                    if (node.right != null) {
+                        queue.offerLast(node.right);
+                        size++;
+                    }
+                    list.add(node.val);
+                } else { // 偶数层，从右往左打印
+                    node = queue.pollLast();
+                    if (node.right != null) {
+                        queue.offerFirst(node.right);
+                        size++;
+                    }
+                    if (node.left != null) {
+                        queue.offerFirst(node.left);
+                        size++;
+                    }
+                    list.add(node.val);
+                }
+            }
+            res.add(list);
+            level++;
+            count = size;
+        }
+
+        return res;
+    }
+}
+```
+
+### 60.把二叉树打印成多行
+
+### 题目描述
+
+从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
+
+结点定义如下：
+
+```java
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
+```java
+public class Solution {
+    ArrayList<ArrayList<Integer>> Print(TreeNode pRoot) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        if (pRoot == null) {
+            return res;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(pRoot);
+        int count = 1;// 记录当前层多少结点
+        while (count > 0) {
+            ArrayList<Integer> list = new ArrayList<>();
+            int nextCount = 0;
+            while (count-- > 0) {
+                TreeNode node = queue.poll();
+                list.add(node.val);
+                if (node.left != null) {
+                    queue.offer(node.left);
+                    nextCount++;
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                    nextCount++;
+                }
+            }
+            if (list.size() > 0) {
+                res.add(list);
+            }
+            count = nextCount;
+        }
+        return res;
+    }
+}
+```
+
+### 61.序列化二叉树
+
+#### 题目描述
+
+请实现两个函数，分别用来序列化和反序列化二叉树
+
+结点定义如下：
+
+```java
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
+```java
+public class Solution {
+    private int index = -1;
+    
+    public String Serialize(TreeNode root) {
+        if (root == null) {
+            return "#,";
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(root.val).append(",");
+        sb.append(Serialize(root.left));
+        sb.append(Serialize(root.right));
+        return sb.toString();
+    }
+
+    public TreeNode Deserialize(String str) {
+        if (str == null) {
+            return null;
+        }
+        
+        String[] values = str.split(",");
+        return helper(values);
+    }
+    
+    private TreeNode helper(String[] values) {
+        index++;
+        if ("#".equals(values[index])) {
+            return null;
+        }
+        TreeNode node = new TreeNode(Integer.valueOf(values[index]));
+        node.left = helper(values);
+        node.right = helper(values);
+        return node;
     }
 }
 ```
