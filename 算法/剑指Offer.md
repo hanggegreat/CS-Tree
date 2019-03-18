@@ -2430,7 +2430,7 @@ public class Solution {
 
 ### 60.把二叉树打印成多行
 
-### 题目描述
+#### 题目描述
 
 从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
 
@@ -2541,6 +2541,225 @@ public class Solution {
         node.left = helper(values);
         node.right = helper(values);
         return node;
+    }
+}
+```
+
+### 62.二叉搜索树的第k个结点
+
+#### 题目描述
+
+给定一棵二叉搜索树，请找出其中的第k小的结点。例如， （5，3，7，2，4，6，8）    中，按结点数值大小顺序第三小结点的值为4。
+
+结点定义如下：
+
+```java
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+```
+
+#### Solution:
+
+```java
+/**
+* 中序遍历
+*/
+public class Solution {
+    public TreeNode KthNode(TreeNode pRoot, int k) {
+        int count = 0;
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode node = pRoot;
+        
+        while (node != null || !stack.isEmpty()) {
+            while (node != null) {
+                stack.push(node);
+                node = node.left;
+            }
+            node = stack.pop();
+            count++;
+            if (count == k) {
+                return node;
+            }
+            node = node.right;
+        }
+        return null;
+    }
+}
+```
+
+### 63.数据流中的中位数
+
+#### 题目描述
+
+如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。
+
+```java
+import java.util.*;
+
+/**
+ * 使用一个小顶堆和一个大顶堆，可以保证小顶堆的数都大于大顶堆，并且二者元素个数只差为0或1
+ */
+public class Solution {
+    private int count = 0;
+    private Queue<Integer> minHeap = new PriorityQueue<>();
+    private Queue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
+
+    public void Insert(Integer num) {
+        if (count++ % 2 == 1) {
+            maxHeap.offer(num);
+            minHeap.offer(maxHeap.poll());
+        } else {
+            minHeap.offer(num);
+            maxHeap.offer(minHeap.poll());
+        }
+    }
+
+    public Double GetMedian() {
+        return count % 2 == 1 ? maxHeap.peek() * 1.0 : ((minHeap.peek() + maxHeap.peek()) / 2.0);
+    }
+}
+```
+
+### 64.滑动窗口的最大值
+
+#### 题目描述
+
+给定一个数组和滑动窗口的大小，找出所有滑动窗口里数值的最大值。例如，如果输入数组{2,3,4,2,6,2,5,1}及滑动窗口的大小3，那么一共存在6个滑动窗口，他们的最大值分别为{4,4,6,6,6,5}； 针对数组{2,3,4,2,6,2,5,1}的滑动窗口有以下6个： {[2,3,4],2,6,2,5,1}， {2,[3,4,2],6,2,5,1}， {2,3,[4,2,6],2,5,1}， {2,3,4,[2,6,2],5,1}， {2,3,4,2,[6,2,5],1}， {2,3,4,2,6,[2,5,1]}。
+
+```java
+import java.util.*;
+
+public class Solution {
+    public ArrayList<Integer> maxInWindows(int[] num, int size) {
+        ArrayList<Integer> res = new ArrayList<>();
+        if (num == null || num.length < size || size <= 0) {
+            return res;
+        }
+        LinkedList<Integer> queue = new LinkedList<>();
+
+        for (int i = 0; i < size - 1; i++) {
+            while(!queue.isEmpty() && num[queue.peekLast()] < num[i]) {
+                queue.pollLast();
+            }
+            queue.offerLast(i);
+        }
+
+        for (int i = size - 1; i < num.length; i++) {
+            while(!queue.isEmpty() && num[queue.peekLast()] < num[i]) {
+                queue.pollLast();
+            }
+            queue.offerLast(i);
+            if (i - queue.peekFirst() + 1 > size) {
+                queue.pollFirst();
+            }
+            res.add(num[queue.peekFirst()]);
+        }
+        return res;
+    }
+}
+```
+
+### 65.矩阵中的路径
+
+#### 题目描述：
+
+请设计一个函数，用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径。路径可以从矩阵中的任意一个格子开始，每一步可以在矩阵中向左，向右，向上，向下移动一个格子。如果一条路径经过了矩阵中的某一个格子，则之后不能再次进入这个格子。 例如 a b c e s f c s a d e e 这样的3 X 4 矩阵中包含一条字符串"bcced"的路径，但是矩阵中不包含"abcb"路径，因为字符串的第一个字符b占据了矩阵中的第一行第二个格子之后，路径不能再次进入该格子。
+
+#### Solution:
+
+```java
+public class Solution {
+    private int index = 0;
+    private boolean[] visited;
+
+    public boolean hasPath(char[] matrix, int rows, int cols, char[] str) {
+        if (matrix == null || str == null) {
+            return false;
+        }
+
+        visited = new boolean[rows * cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (helper(matrix, rows, cols, str, i, j)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean helper(char[] matrix, int rows, int cols, char[] str, int row, int col) {
+        if (index == str.length) {
+            return true;
+        }
+
+        boolean flag = false;
+        if (col < cols && col >= 0
+                && row < rows && row >= 0
+                && str[index] == matrix[row * cols + col]
+                && !visited[row * cols + col]) {
+            visited[row * cols + col] = true;
+            index++;
+            flag = helper(matrix, rows, cols, str, row + 1, col)
+                    || helper(matrix, rows, cols, str, row - 1, col)
+                    || helper(matrix, rows, cols, str, row, col - 1)
+                    || helper(matrix, rows, cols, str, row, col + 1);
+            if (!flag) {
+                index--;
+                visited[row * cols + col] = false;
+            }
+        }
+        return flag;
+    }
+}
+```
+
+#### 66.机器人的运动范围：
+
+#### 题目描述
+
+地上有一个m行和n列的方格。一个机器人从坐标0,0的格子开始移动，每一次只能向左，右，上，下四个方向移动一格，但是不能进入行坐标和列坐标的数位之和大于k的格子。 例如，当k为18时，机器人能够进入方格（35,37），因为3+5+3+7 = 18。但是，它不能进入方格（35,38），因为3+5+3+8 = 19。请问该机器人能够达到多少个格子？
+
+#### Solution:
+
+```java
+public class Solution {
+    private int res = 0;
+    private boolean[][] visited;
+    
+    public int movingCount(int threshold, int rows, int cols) {
+        visited = new boolean[rows][cols];
+        dfs(threshold, rows, cols, 0, 0);
+        return res;
+    }
+    
+    private void dfs(int threshold, int rows, int cols, int row, int col) {
+        if (row < rows && col < cols && bitSum(row, col) <= threshold && !visited[row][col]) {
+            visited[row][col] = true;
+            res++;
+            dfs(threshold, rows, cols, row + 1, col);
+            dfs(threshold, rows, cols, row, col + 1);
+        }
+    }
+    
+    private int bitSum(int row, int col) {
+        int sum = 0;
+        while (row > 0) {
+            sum += row % 10;
+            row /= 10;
+        }
+        while (col > 0) {
+            sum += col % 10;
+            col /= 10;
+        }
+        return sum;
     }
 }
 ```
