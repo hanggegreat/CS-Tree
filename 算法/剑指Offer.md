@@ -50,6 +50,22 @@
 - [48.不用加减乘除做加法](#48不用加减乘除做加法)
 - [49.把字符串转换成整数](#49把字符串转换成整数)
 - [50.数组中重复的数字](#50数组中重复的数字)
+- [51.构建乘积数组](#51构建乘积数组)
+- [52.正则表达式匹配](#52正则表达式匹配)
+- [53.表示数值的字符串](#53表示数值的字符串)
+- [54.字符流中第一个不重复的字符](#54字符流中第一个不重复的字符)
+- [55.链表中环的入口结点](#55链表中环的入口结点)
+- [56.删除链表中重复的结点](#56删除链表中重复的结点)
+- [57.二叉树的下一个结点](#57二叉树的下一个结点)
+- [58.对称的二叉树](#58对称的二叉树)
+- [59.按之字形打印二叉树](#59按之字形打印二叉树)
+- [60.把二叉树打印成多行](#60把二叉树打印成多行)
+- [61.序列化二叉树](#61序列化二叉树)
+- [62.二叉搜索树的第k个结点](#62二叉搜索树的第k个结点)
+- [63.数据流中的中位数](#63数据流中的中位数)
+- [64.滑动窗口的最大值](#64滑动窗口的最大值)
+- [65.矩阵中的路径](#65矩阵中的路径)
+- [66.机器人的运动范围](#66机器人的运动范围)
 
 ### 1.二维数组中的查找
 
@@ -1987,6 +2003,229 @@ public class Solution {
             set.add(number);
         }
         return false;
+    }
+}
+```
+
+### 51.构建乘积数组
+
+#### 题目描述
+
+给定一个数组A[0,1,...,n-1],请构建一个数组B[0,1,...,n-1],其中B中的元素B[i]=A[0]*A[1]*...*A[i-1]*A[i+1]*...*A[n-1]。不能使用除法。
+
+#### Solution:
+
+```java
+import java.util.ArrayList;
+
+public class Solution {
+    public int[] multiply(int[] A) {
+        if (A == null) {
+            return A;
+        }
+        
+        int[] B = new int[A.length];
+        
+        // 从前往后遍历，每次product = A[0] * A[1] * ... * A[i - 1];
+        for (int i = 0, product = 1; i < A.length; product *= A[i], i++) {
+            B[i] = product;
+        }
+        
+        // 从后往前遍历，每次product = A[n - 1] * A[n - 2] * ... * A[i + 1]
+        for (int i = A.length - 1, product = 1; i >= 0; product *= A[i], i--) {
+            B[i] *= product;
+        }
+        
+        return B;
+    }
+}
+```
+
+### 52.正则表达式匹配
+
+#### 题目描述
+
+请实现一个函数用来匹配包括'.'和'\*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（包含0次）。 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab\*ac\*a"匹配，但是与"aa.a"和"ab\*a"均不匹配
+
+#### Solution:
+
+```java
+class Solution {
+    public boolean match(char[] str, char[] pattern) {
+        if (str == null || pattern == null) {
+            return false;
+        }
+        return match(str, pattern, 0, 0);
+    }
+
+    /**
+     * 匹配正则表达式
+     * @param str 要匹配的字符串
+     * @param pattern 正则表达式
+     * @param s str索引
+     * @param p patter索引
+     * @return
+     */
+    private boolean match(char[] str, char[] pattern, int s, int p) {
+        // 到底了
+        if (s == str.length && p == pattern.length) {
+            return true;
+        }
+        // 很明显str还没匹配完，正则表达式就不够用了
+        if (s < str.length && p == pattern.length) {
+            return false;
+        }
+        // 正则表达式下一位为'*'
+        if (p + 1 < pattern.length && pattern[p + 1] == '*') {
+            // 当前位匹配，所以匹配1位或者0位
+            if (str.length > s && (pattern[p] == str[s] || pattern[p] == '.')) {
+                return match(str, pattern, s, p + 2)
+                        || match(str, pattern, s + 1, p);
+            }
+            // 当前位不匹配或者str到底了，所以匹配0位
+            return match(str, pattern, s, p + 2);
+        }
+
+        // 匹配1位
+        if (str.length > s && (pattern[p] == '.' || pattern[p] == str[s])) {
+            return match(str, pattern, s + 1, p + 1);
+        }
+
+        return false;
+    }
+}
+```
+
+#### 53.表示数值的字符串
+
+#### 题目描述
+
+请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100","5e2","-123","3.1416"和"-1E-16"都表示数值。 但是"12e","1a3.14","1.2.3","+-5"和"12e+4.3"都不是。
+
+#### Solution:
+
+```java
+/**
+* 利用正则表达式求解，字符串格式应为正负号（非必须）+ 整数（必须）+ 小数点和整数（非必须）+（E或e和正负号（非必须）和整数）（非必须）
+*/
+public class Solution {
+    public boolean isNumeric(char[] str) {
+        if (str == null || str.length < 1) {
+            return false;
+        }
+        
+        return String.valueOf(str).matches("[\\+\\-]?\\d*(\\.\\d+)?([Ee][\\+\\-]?\\d+)?");
+    }
+}
+```
+
+### 54.字符流中第一个不重复的字符
+
+#### 题目描述
+
+请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
+
+#### 输出描述:
+
+```html
+如果当前字符流没有存在出现一次的字符，返回#字符。
+```
+
+#### Solution:
+
+```java
+import java.util.LinkedHashMap;
+
+/**
+ * LinkedHashMap利用双向链表保存了键的插入顺序
+ */
+public class Solution {
+    private LinkedHashMap<Character, Integer> map = new LinkedHashMap<>();
+
+    //Insert one char from stringstream
+    public void Insert(char ch) {
+        map.put(ch, map.getOrDefault(ch, 0) + 1);
+    }
+
+    //return the first appearence once char in current stringstream
+    public char FirstAppearingOnce() {
+        for (Character character : map.keySet()) {
+            if (map.get(character) == 1) {
+                return character;
+            }
+        }
+        return '#';
+    }
+}
+```
+
+### 55.链表中环的入口结点
+
+#### 题目描述
+
+给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+
+#### Solution:
+
+```java
+/**
+ * 先说个定理：两个指针一个fast、一个slow同时从一个链表的头部出发
+ * fast一次走2步，slow一次走一步，如果该链表有环，两个指针必然在环内相遇
+ * 此时只需要把其中的一个指针重新指向链表头部，另一个不变（还在环内），
+ * 这次两个指针一次走一步，相遇的地方就是入口节点。
+ */
+public class Solution {
+    public ListNode EntryNodeOfLoop(ListNode pHead) {
+        ListNode slow = pHead;
+        ListNode fast = pHead;
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) {
+                break;
+            }
+        }
+        if (fast != null && fast.next == null) {
+            return null;
+        }
+        slow = pHead;
+        while (slow != fast) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+
+        return slow;
+    }
+}
+```
+
+### 56.删除链表中重复的结点
+
+#### 题目描述
+
+在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
+
+```java
+public class Solution {
+    public ListNode deleteDuplication(ListNode pHead) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = pHead;
+        ListNode pre = dummy;
+        ListNode curr = pHead;
+        while (curr != null) {
+            if (curr.next != null && curr.next.val == curr.val) {
+                int temp = curr.val;
+                curr = curr.next.next;
+                while (curr != null && curr.val == temp) {
+                    curr = curr.next;
+                }
+                pre.next = curr;
+            } else {
+                pre = curr;
+                curr = curr.next;
+            }
+        }
+        return dummy.next;
     }
 }
 ```
