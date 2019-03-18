@@ -2,6 +2,12 @@
 
 [1.两数之和](#1两数之和)
 
+[2.两数相加](#2两数相加)
+
+[3.无重复字符的最长子串](#3无重复字符的最长子串)
+
+
+
 
 
 ### 1.两数之和
@@ -87,6 +93,63 @@ class Solution {
             l2 = l2 == null ? null : l2.next;
         }
         return dummy.next;
+    }
+}
+```
+
+### 3.无重复字符的最长子串
+
+**题目描述：**
+
+给定一个字符串，请你找出其中不含有重复字符的 **最长子串** 的长度。
+
+**示例 1:**
+
+```
+输入: "abcabcbb"
+输出: 3 
+解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+```
+
+**示例 2:**
+
+```
+输入: "bbbbb"
+输出: 1
+解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+```
+
+**示例 3:**
+
+```
+输入: "pwwkew"
+输出: 3
+解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+```
+
+**Solution:**
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if (s == null || s.length() < 1) {
+            return 0;
+        }
+        
+        int[] map = new int[256];
+        int l = 0;
+        int r = 0; // 滑动窗口为[l, r)，其间为不重复的元素
+        int res = 0;
+        while (l < s.length()) {
+            if (r < s.length() && map[s.charAt(r)] == 0) {
+                map[s.charAt(r++)]++;
+                res = Math.max(res, r - l);
+            } else {
+                map[s.charAt(l++)]--;
+            }
+        }
+        return res;
     }
 }
 ```
