@@ -268,7 +268,7 @@ public class Solution {
         while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
             if (right - left + 1 > len) {
                 len = right - left + 1;
-                this.left = left--;
+                this.left = left;
             }
             right++;
             left--;
