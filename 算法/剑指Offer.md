@@ -2069,21 +2069,17 @@ class Solution {
      */
     private boolean match(char[] str, char[] pattern, int s, int p) {
         // 到底了
-        if (s == str.length && p == pattern.length) {
-            return true;
+        if (p == pattern.length) {
+            return s == str.length;
         }
-        // 很明显str还没匹配完，正则表达式就不够用了
-        if (s < str.length && p == pattern.length) {
-            return false;
-        }
-        // 正则表达式下一位为'*'
+        // 正则表达式下一位为*，此时考虑两种情况
         if (p + 1 < pattern.length && pattern[p + 1] == '*') {
-            // 当前位匹配，所以匹配1位或者0位
+            // 若正则表达式当前位字符与字符串当前位置相匹配，则匹配1位或者0位
             if (str.length > s && (pattern[p] == str[s] || pattern[p] == '.')) {
                 return match(str, pattern, s, p + 2)
                         || match(str, pattern, s + 1, p);
             }
-            // 当前位不匹配或者str到底了，所以匹配0位
+            // 若正则表达式当前位字符与字符串当前位置不匹配，则匹配0位
             return match(str, pattern, s, p + 2);
         }
 
