@@ -760,3 +760,52 @@ public class Solution {
 }
 ```
 
+### 23.合并K个排序链表
+
+合并 *k* 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。
+
+**示例:**
+
+```HTML
+输入:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+输出: 1->1->2->3->4->4->5->6
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists == null || lists.length == 0) {
+            return null;
+        }
+
+        ListNode dummy = new ListNode(0);
+        ListNode pre = dummy;
+
+        // 使用小顶堆，每次取出的都是最小的节点
+        Queue<ListNode> minHeap = new PriorityQueue<>(Comparator.comparingInt(node -> node.val));
+        for (ListNode list : lists) {
+            if (list != null) {
+                minHeap.offer(list);
+            }
+        }
+
+        while (!minHeap.isEmpty()) {
+            pre.next = minHeap.poll();
+            pre = pre.next;
+            if (pre.next != null) {
+                minHeap.offer(pre.next);
+            }
+        }
+
+        return dummy.next;
+    }
+}
+```
+
