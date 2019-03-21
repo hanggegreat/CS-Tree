@@ -847,6 +847,77 @@ public class Solution {
 **Solution：**
 
 ```java
+/**
+ * 求下一个全排列，可分为两种情况：
+ * 1.例如像 5 4 3 2 1这样的序列，已经是最大的排列，即每个位置上的数非递增，这时只需要翻转整个序列即可
+ * 2.例如像 1 3 5 4 2这样的序列，要从后往前找到第一个比后面一位小的元素的位置，即第二个位置的3，然后与其后第一个比它大的元素交换位置，得到 1 4 5 3 2，再将 5 3 2翻转得到 1 4 2 3 5即可
+ */
+
+public class Solution {
+    public void nextPermutation(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return;
+        }
+
+        int firstSmall = -1;
+        for (int i = nums.length - 2; i >= 0; i--) {
+            if (nums[i] < nums[i + 1]) {
+                firstSmall = i;
+                break;
+            }
+        }
+
+        if (firstSmall == -1) {
+            reverse(nums, 0, nums.length - 1);
+            return;
+        }
+
+        for (int i = nums.length - 1; i > firstSmall; i--) {
+            if (nums[i] > nums[firstSmall]) {
+                swap(nums, i, firstSmall);
+                reverse(nums, firstSmall + 1, nums.length - 1);
+                return;
+            }
+        }
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+
+    private void reverse(int[] nums, int start, int end) {
+        while (start < end) {
+            swap(nums, start++, end--);
+        }
+    }
+}
+```
+
+### 32.最长有效括号
+
+给定一个只包含 `'('` 和 `')'` 的字符串，找出最长的包含有效括号的子串的长度。
+
+**示例 1:**
+
+```
+输入: "(()"
+输出: 2
+解释: 最长有效括号子串为 "()"
+```
+
+**示例 2:**
+
+```HTML
+输入: ")()())"
+输出: 4
+解释: 最长有效括号子串为 "()()"
+```
+
+**Solution：**
+
+```java
 
 ```
 
