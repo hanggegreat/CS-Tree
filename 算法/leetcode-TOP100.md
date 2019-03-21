@@ -14,7 +14,21 @@
 
 [11.盛最多水的容器](#11盛最多水的容器)
 
+[15.三数之和](#15三数之和)
 
+[17.电话号码的字母组合](#17电话号码的字母组合)
+
+[19.删除链表的倒数第N个节点](#19删除链表的倒数第N个节点)
+
+[20.有效的括号](#20有效的括号)
+
+[21.合并两个有序链表](#21合并两个有序链表)
+
+[22.括号生成](#22括号生成)
+
+[23.合并K个排序链表](#23合并K个排序链表)
+
+[24.两两交换链表中的节点](#24两两交换链表中的节点)
 
 ### 1.两数之和
 
@@ -384,7 +398,7 @@ public class Solution {
 }
 ```
 
-### 11.盛水最多的容器
+### 11.盛最多水的容器
 
 **题目描述：**
 
@@ -427,6 +441,321 @@ public class Solution {
         }
         
         return res;
+    }
+}
+```
+
+### 15.三数之和
+
+**题目描述：**
+
+给定一个包含 *n* 个整数的数组 `nums`，判断 `nums` 中是否存在三个元素 *a，b，c ，*使得 *a + b + c =* 0 ？找出所有满足条件且不重复的三元组。
+
+**注意：**答案中不可以包含重复的三元组。
+
+```HTML
+例如, 给定数组 nums = [-1, 0, 1, 2, -1, -4]，
+
+满足要求的三元组集合为：
+[
+  [-1, 0, 1],
+  [-1, -1, 2]
+]
+```
+
+**Solution：**
+
+```java
+/**
+ * 采用滑动窗口，时间复杂度为：O(n log(n))
+ */
+public class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> list = new ArrayList<>();
+        if (nums == null || nums.length < 3) {
+            return list;
+        }
+
+        // 先排序，同时避免求重复解
+        Arrays.sort(nums);
+
+        for (int i = 0; i < nums.length - 2 && nums[i] <= 0;) {
+            int l = i + 1;
+            int r = nums.length - 1;
+            while (l < r) {
+                int sum = nums[i] + nums[l] + nums[r];
+                if (sum == 0) {
+                    list.add(Arrays.asList(nums[i], nums[l++], nums[r--]));
+                    while (l < r && nums[l] == nums[l - 1]) {
+                        l++;
+                    }
+                    while (r > l && nums[r] == nums[r + 1]) {
+                        r--;
+                    }
+                } else if (sum < 0) {
+                    l++;
+                } else {
+                    r--;
+                }
+            }
+            i++;
+            while (i < nums.length - 2 && nums[i] == nums[i - 1]) {
+                i++;
+            }
+        }
+        return list;
+    }
+}
+```
+
+### 17.电话号码的字母组合
+
+**题目描述：**
+
+给定一个仅包含数字 `2-9` 的字符串，返回所有它能表示的字母组合。
+
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+
+![img](http://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Telephone-keypad2.svg/200px-Telephone-keypad2.svg.png)
+
+**示例:**
+
+```
+输入："23"
+输出：["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"].
+```
+
+**说明:**
+尽管上面的答案是按字典序排列的，但是你可以任意选择答案输出的顺序。
+
+**Solution：**
+
+```java
+public class Solution {
+    private List<String> res = new ArrayList<>();
+    private String[] map = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+
+    public List<String> letterCombinations(String digits) {
+        if (digits == null || digits.length() < 1) {
+            return res;
+        }
+
+        dfs(digits, 0, "");
+        return res;
+    }
+
+    private void dfs(String digits, int index, String str) {
+        if (index == digits.length()) {
+            res.add(str);
+            return;
+        }
+        
+        String dict = map[digits.charAt(index) - '0'];
+        for (int i = 0; i < dict.length(); i++) {
+            dfs(digits, index + 1, str + dict.charAt(i));
+        }
+    }
+}
+```
+
+### 19.删除链表的倒数第N个节点
+
+给定一个链表，删除链表的倒数第 *n* 个节点，并且返回链表的头结点。
+
+**示例：**
+
+```
+给定一个链表: 1->2->3->4->5, 和 n = 2.
+
+当删除了倒数第二个节点后，链表变为 1->2->3->5.
+```
+
+**说明：**
+
+给定的 *n* 保证是有效的。
+
+**进阶：**
+
+你能尝试使用一趟扫描实现吗？
+
+**Solution：**
+
+```java
+/*
+* 双指针
+*/
+public class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode fast = head;
+        ListNode slow = dummy;
+        for (int i = 0; i < n; i++) {
+            fast = fast.next;
+        }
+        while (fast != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        slow.next = slow.next.next;
+        return dummy.next;
+    }
+}
+```
+
+### 20有效的括号
+
+给定一个只包括 `'('`，`')'`，`'{'`，`'}'`，`'['`，`']'` 的字符串，判断字符串是否有效。
+
+有效字符串需满足：
+
+1. 左括号必须用相同类型的右括号闭合。
+2. 左括号必须以正确的顺序闭合。
+
+注意空字符串可被认为是有效字符串。
+
+**示例 1:**
+
+```
+输入: "()"
+输出: true
+```
+
+**示例 2:**
+
+```
+输入: "()[]{}"
+输出: true
+```
+
+**示例 3:**
+
+```
+输入: "(]"
+输出: false
+```
+
+**示例 4:**
+
+```
+输入: "([)]"
+输出: false
+```
+
+**示例 5:**
+
+```HTML
+输入: "{[]}"
+输出: true
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public static boolean isValid(String s) {
+        if (s == null || (s.length() & 1) == 1) {
+            return false;
+        }
+
+        Stack<Character> stack = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '[' || s.charAt(i) == '{' || s.charAt(i) == '(') {
+                stack.push(s.charAt(i));
+            } else if (s.charAt(i) == ']' && (stack.isEmpty() || stack.pop() != '[')) {
+                return false;
+            } else if (s.charAt(i) == '}' && (stack.isEmpty() || stack.pop() != '{')) {
+                return false;
+            } else if (s.charAt(i) == ')' && (stack.isEmpty() || stack.pop() != '(')) {
+                return false;
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
+### 21.合并两个有序链表
+
+**题目描述：**
+
+将两个有序链表合并为一个新的有序链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
+
+**示例：**
+
+```HTML
+输入：1->2->4, 1->3->4
+输出：1->1->2->3->4->4
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0);
+        ListNode pre = dummy;
+        
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                pre.next = l1;
+                l1 = l1.next;
+            } else {
+                pre.next = l2;
+                l2 = l2.next;
+            }
+            pre = pre.next;
+        }
+        pre.next = l1 == null ? l2 : l1;
+        
+        return dummy.next;
+    }
+}
+```
+
+### 22.生成括号
+
+**题目描述：**
+
+给出 *n* 代表生成括号的对数，请你写出一个函数，使其能够生成所有可能的并且**有效的**括号组合。
+
+例如，给出 *n* = 3，生成结果为：
+
+```HTML
+[
+  "((()))",
+  "(()())",
+  "(())()",
+  "()(())",
+  "()()()"
+]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    private List<String> list = new ArrayList<>();
+    
+    public List<String> generateParenthesis(int n) {
+        if (n < 1) {
+            return list;
+        }
+        
+        generate(n, 0, 0, "");
+        return list;
+    }
+    
+    private void generate(int n, int left, int right, String str) {
+        if (left == right && left == n) {
+            list.add(str);
+        }
+        if (left < n) {
+            generate(n, left + 1, right, str + "(");
+        }
+        if (left > right) {
+            generate(n, left, right + 1, str + ")");
+        }
     }
 }
 ```
