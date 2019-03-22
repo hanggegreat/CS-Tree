@@ -46,7 +46,17 @@
 
 [49.字母异位词分组](#49字母异位词分组)
 
+[53.最大子序和](#53最大子序和)
 
+[55.跳跃游戏](#55跳跃游戏)
+
+[56.合并区间](#56合并区间)
+
+[62.不同路径](#62不同路径)
+
+[64.最小路径和](#64最小路径和)
+
+[70.爬楼梯](#70爬楼梯)
 
 
 
@@ -580,6 +590,8 @@ public class Solution {
 
 ### 19.删除链表的倒数第N个节点
 
+**题目描述：**
+
 给定一个链表，删除链表的倒数第 *n* 个节点，并且返回链表的头结点。
 
 **示例：**
@@ -624,6 +636,8 @@ public class Solution {
 ```
 
 ### 20有效的括号
+
+**题目描述：**
 
 给定一个只包括 `'('`，`')'`，`'{'`，`'}'`，`'['`，`']'` 的字符串，判断字符串是否有效。
 
@@ -782,6 +796,8 @@ public class Solution {
 
 ### 23.合并K个排序链表
 
+**题目描述：**
+
 合并 *k* 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。
 
 **示例:**
@@ -897,6 +913,8 @@ public class Solution {
 
 ### 32.最长有效括号
 
+**题目描述：**
+
 给定一个只包含 `'('` 和 `')'` 的字符串，找出最长的包含有效括号的子串的长度。
 
 **示例 1:**
@@ -913,6 +931,547 @@ public class Solution {
 输入: ")()())"
 输出: 4
 解释: 最长有效括号子串为 "()()"
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int longestValidParentheses(String s) {
+        if (s == null || s.length() < 2) {
+            return 0;
+        }
+
+        int res = 0;
+        int start = 0;
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '(') {
+                stack.push(i);
+            } else {
+                if (stack.isEmpty()) {
+                    start = i + 1;
+                } else {
+                    stack.pop();
+                    res = stack.isEmpty() ? Math.max(res, i - start + 1) : Math.max(res, i - stack.peek());
+                }
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 33.搜索旋转排序数组
+
+**题目描述：**
+
+假设按照升序排序的数组在预先未知的某个点上进行了旋转。
+
+( 例如，数组 `[0,1,2,4,5,6,7]` 可能变为 `[4,5,6,7,0,1,2]` )。
+
+搜索一个给定的目标值，如果数组中存在这个目标值，则返回它的索引，否则返回 `-1` 。
+
+你可以假设数组中不存在重复的元素。
+
+你的算法时间复杂度必须是 *O*(log *n*) 级别。
+
+**示例 1:**
+
+```
+输入: nums = [4,5,6,7,0,1,2], target = 0
+输出: 4
+```
+
+**示例 2:**
+
+```HTML
+输入: nums = [4,5,6,7,0,1,2], target = 3
+输出: -1
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int search(int[] nums, int target) {
+        if (nums == null 
+            || nums.length < 1 
+            || (target < nums[0] && target > nums[nums.length - 1])) {
+            return -1;
+        }
+        
+        int low = 0;
+        int high = nums.length - 1;
+        while (low <= high) {
+            int mid = (low + high) >> 1;
+            if (nums[mid] == target) {
+                return mid;
+            }
+            
+            if (nums[mid] >= nums[low]) {// 左边有序
+                if (nums[mid] > target && nums[low] <= target) {// 在有序边
+                    high = mid - 1;
+                } else{// 在无序边
+                    low = mid + 1;
+                }
+            } else {// 右边有序
+                if (nums[mid] < target && nums[high] >= target) {// 在有序边
+                    low = mid + 1;
+                } else {// 在无序边
+                    high = mid - 1;
+                }
+            }
+        }
+        
+        return -1;
+    }
+}
+```
+
+### 34.在排序数组中查找元素的第一个和最后一个位置
+
+**题目描述：**
+
+给定一个按照升序排列的整数数组 `nums`，和一个目标值 `target`。找出给定目标值在数组中的开始位置和结束位置。
+
+你的算法时间复杂度必须是 *O*(log *n*) 级别。
+
+如果数组中不存在目标值，返回 `[-1, -1]`。
+
+**示例 1:**
+
+```
+输入: nums = [5,7,7,8,8,10], target = 8
+输出: [3,4]
+```
+
+**示例 2:**
+
+```HTML
+输入: nums = [5,7,7,8,8,10], target = 6
+输出: [-1,-1]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int[] searchRange(int[] nums, int target) {
+        if (nums == null || nums.length < 1) {
+            return new int[]{-1, -1};
+        }
+        
+        int low = 0;
+        int high = nums.length - 1;
+        while (low <= high) {
+            int mid = (low + high) >> 1;
+            if (nums[mid] < target) {
+                low = mid + 1;
+            } else if (nums[mid] > target) {
+                high = mid - 1;
+            } else {
+                int left = mid;
+                int right = mid;
+                while (left >= low && nums[left] == target) {
+                    left--;
+                }
+                while (right <= high && nums[right] == target) {
+                    right++;
+                }
+                return new int[]{left + 1, right -1};
+            }
+        }
+        
+        return new int[]{-1, -1};
+    }
+}
+```
+
+### 39.组合总和
+
+**题目描述：**
+
+给定一个**无重复元素**的数组 `candidates` 和一个目标数 `target` ，找出 `candidates` 中所有可以使数字和为 `target` 的组合。
+
+`candidates` 中的数字可以无限制重复被选取。
+
+**说明：**
+
+- 所有数字（包括 `target`）都是正整数。
+- 解集不能包含重复的组合。 
+
+**示例 1:**
+
+```
+输入: candidates = [2,3,6,7], target = 7,
+所求解集为:
+[
+  [7],
+  [2,2,3]
+]
+```
+
+**示例 2:**
+
+```HTML
+输入: candidates = [2,3,5], target = 8,
+所求解集为:
+[
+  [2,2,2,2],
+  [2,3,3],
+  [3,5]
+]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    private List<List<Integer>> res = new ArrayList<>();;
+
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        if (candidates == null || candidates.length == 0) {
+            return res;
+        }
+        dfs(candidates, 0, target, new ArrayList<>());
+        return res;
+    }
+
+    private void dfs(int[] candidates, int start, int target, List<Integer> list) {
+        if (target == 0) {
+            res.add(new ArrayList<>(list));
+            return;
+        }
+
+        for (int i = start; i < candidates.length; i++) {
+            if (target >= candidates[i]) {
+                list.add(candidates[i]);
+                dfs(candidates, i, target - candidates[i], list);
+                list.remove(list.size() - 1);
+            }
+        }
+    }
+}
+```
+
+### 42.接雨水
+
+**题目描述：**
+
+给定 *n* 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/22/rainwatertrap.png)
+
+上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。 **感谢 Marcos** 贡献此图。
+
+**示例:**
+
+```HTML
+输入: [0,1,0,2,1,0,1,3,2,1,2,1]
+输出: 6
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int trap(int[] height) {
+        if (height == null || height.length < 3) {
+            return 0;
+        }
+        
+        int low = 0;
+        int high = height.length - 1;
+        int res = 0;
+        int lowMax = 0;
+        int highMax = 0;
+        while (low < high) {
+            if (height[low] < height[high]) {
+                lowMax = Math.max(lowMax, height[low]);
+                res += lowMax - height[low];
+                low++;
+            } else {
+                highMax = Math.max(highMax, height[high]);
+                res += highMax - height[high];
+                high--;
+            }
+        }
+        
+        return res;
+    }
+}
+```
+
+### 46.全排列
+
+**题目描述：**
+
+给定一个**没有重复**数字的序列，返回其所有可能的全排列。
+
+**示例:**
+
+```HTML
+输入: [1,2,3]
+输出:
+[
+  [1,2,3],
+  [1,3,2],
+  [2,1,3],
+  [2,3,1],
+  [3,1,2],
+  [3,2,1]
+]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    private List<List<Integer>> res = new ArrayList<>();
+    private boolean[] visited;
+
+    public List<List<Integer>> permute(int[] nums) {
+        if (nums == null) {
+            return res;
+        }
+        
+        visited = new boolean[nums.length];
+        permute(0, nums, new ArrayList());
+        return res;
+    }
+    
+    private void permute(int index, int[] nums, List<Integer> list) {
+        if (index == nums.length) {
+            res.add(new ArrayList(list));
+            return;
+        }
+        
+        for (int i = 0; i < nums.length; i++) {
+            if (!visited[i]) {
+                list.add(nums[i]);
+                visited[i] = true;
+                permute(index + 1, nums, list);
+                list.remove(list.size() - 1);
+                visited[i] = false;
+            }
+        }
+    }
+}
+```
+
+### 48.旋转图像
+
+**题目描述：**
+
+给定一个 *n* × *n* 的二维矩阵表示一个图像。
+
+将图像顺时针旋转 90 度。
+
+**说明：**
+
+你必须在**原地**旋转图像，这意味着你需要直接修改输入的二维矩阵。**请不要**使用另一个矩阵来旋转图像。
+
+**示例 1:**
+
+```
+给定 matrix = 
+[
+  [1,2,3],
+  [4,5,6],
+  [7,8,9]
+],
+
+原地旋转输入矩阵，使其变为:
+[
+  [7,4,1],
+  [8,5,2],
+  [9,6,3]
+]
+```
+
+**示例 2:**
+
+```html
+给定 matrix =
+[
+  [ 5, 1, 9,11],
+  [ 2, 4, 8,10],
+  [13, 3, 6, 7],
+  [15,14,12,16]
+], 
+
+原地旋转输入矩阵，使其变为:
+[
+  [15,13, 2, 5],
+  [14, 3, 4, 1],
+  [12, 6, 8, 9],
+  [16, 7,10,11]
+]
+```
+
+**Solution：**
+
+```java
+/**
+ * 以第一个数据为例分析：
+ * 1 2 3
+ * 4 5 6
+ * 7 8 9
+ * 先做左右对称翻转，得到：
+ * 3 2 1
+ * 6 5 4
+ * 9 8 7
+ * 再以副对角线为轴做翻转，得到：
+ * 7 4 1
+ * 8 5 2
+ * 9 6 3
+ * 此时即为要求的结果
+ * 故——要先做左右对称翻转，再做一次副对角线翻转即可
+ */
+public class Solution {
+    public void rotate(int[][] matrix) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return;
+        }
+        
+        int n = matrix.length;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < (n >> 1); j++) {
+                swap(matrix, i, j, i, n - j - 1);
+            }
+        }
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j + i + 1 < n; j++) {
+                swap(matrix, i, j, n - 1 - j, n - 1 - i);
+            }
+        }
+    }
+    
+    private void swap(int[][] matrix, int i, int j, int p, int q) {
+        int temp = matrix[i][j];
+        matrix[i][j] = matrix[p][q];
+        matrix[p][q] = temp;
+    }
+}
+```
+
+### 49.字母异位词分组
+
+**题目描述：**
+
+给定一个字符串数组，将字母异位词组合在一起。字母异位词指字母相同，但排列不同的字符串。
+
+**示例:**
+
+```
+输入: ["eat", "tea", "tan", "ate", "nat", "bat"],
+输出:
+[
+  ["ate","eat","tea"],
+  ["nat","tan"],
+  ["bat"]
+]
+```
+
+**说明：**
+
+
+
+- 所有输入均为小写字母。
+- 不考虑答案输出的顺序。
+
+**Solution：**
+
+```java
+public class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        List<List<String>> res = new ArrayList<>();
+        if (strs == null || strs.length == 0) {
+            return res;
+        }
+
+        Map<String, List<String>> map = new HashMap<>();
+        for (String str : strs) {
+            int[] counts = new int[26];
+            for (int i = 0; i < str.length(); i++) {
+                counts[str.charAt(i) - 'a']++;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int count : counts) {
+                sb.append(' ').append(count);
+            }
+            String key = sb.toString();
+            if (!map.containsKey(key)) {
+                map.put(key, new ArrayList<>());
+            }
+            map.get(key).add(str);
+        }
+        return new ArrayList<>(map.values());
+    }
+}
+```
+
+### 53.最大子序和
+
+**题目描述：**
+
+给定一个整数数组 `nums` ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+**示例:**
+
+```HTML
+输入: [-2,1,-3,4,-1,2,1,-5,4],
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int maxSubArray(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        
+        int res = nums[0];
+        int max = 0;
+        for (int num : nums) {
+            max = Math.max(max + num, num);
+            res = Math.max(res, max);
+        }
+        return res;
+    }
+}
+```
+
+### 55.跳跃游戏
+
+**题目描述：**
+
+给定一个非负整数数组，你最初位于数组的第一个位置。
+
+数组中的每个元素代表你在该位置可以跳跃的最大长度。
+
+判断你是否能够到达最后一个位置。
+
+**示例 1:**
+
+```
+输入: [2,3,1,1,4]
+输出: true
+解释: 从位置 0 到 1 跳 1 步, 然后跳 3 步到达最后一个位置。
+```
+
+**示例 2:**
+
+```HTML
+输入: [3,2,1,0,4]
+输出: false
+解释: 无论怎样，你总会到达索引为 3 的位置。但该位置的最大跳跃长度是 0 ， 所以你永远不可能到达最后一个位置。
 ```
 
 **Solution：**
