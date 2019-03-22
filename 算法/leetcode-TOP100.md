@@ -58,6 +58,20 @@
 
 [70.爬楼梯](#70爬楼梯)
 
+[72.编辑距离](#72编辑距离)
+
+[75.颜色分类](#75颜色分类)
+
+[76.最小覆盖子串](#76最小覆盖子串)
+
+[78.子集](#78子集)
+
+[79.单词搜索](#79单词搜索)
+
+[80.柱状图中最大的矩阵](#80柱状图中最大的矩形)
+
+[85.最大矩形](#85最大矩形)
+
 
 
 ### 1.两数之和
@@ -1757,6 +1771,124 @@ public class Solution {
         }
         
         return dp[word1.length()][word2.length()];
+    }
+}
+```
+
+### 75.颜色分类
+
+**题目描述：**
+
+给定一个包含红色、白色和蓝色，一共 *n* 个元素的数组，**原地**对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+
+此题中，我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
+
+**注意:**
+不能使用代码库中的排序函数来解决这道题。
+
+**示例:**
+
+```html
+输入: [2,0,2,1,1,0]
+输出: [0,0,1,1,2,2]
+```
+
+**Solution：**
+
+```java
+class Solution {
+    // 解法一：桶排序
+    public void sortColors(int[] nums) {
+        if (nums == null) {
+            return;
+        }
+        int[] count = new int[3]; // 统计1、2、3出现的次数
+        for (int num : nums) {
+            count[num]++;
+        }
+        int index = 0;
+        for (int i = 0; i < count[0]; i++) {
+            nums[index++] = 0;
+        }
+        for (int i = 0; i < count[1]; i++) {
+            nums[index++] = 1;
+        }
+        for (int i = 0; i < count[2]; i++) {
+            nums[index++] = 2;
+        }
+    }
+
+    // 解法二：三路快排
+    public void sortColors(int[] nums) {
+        if (nums == null) {
+            return;
+        }
+        int zero = -1;// 保证[0, zero]区间内为0
+        int two = nums.length;// 保证[two, nums.length - 1]区间内为2
+        for (int i = 0; i < two; ) {
+            if (nums[i] == 0) {
+                nums[i++] = nums[++zero];
+                nums[zero] = 0;
+            } else if (nums[i] == 2) {
+                nums[i] = nums[--two];
+                nums[two] = 2;
+            } else {
+                i++;
+            }
+        }
+    }
+}
+```
+
+### 76.最小覆盖子串
+
+给定一个字符串 S 和一个字符串 T，请在 S 中找出包含 T 所有字母的最小子串。
+
+**示例：**
+
+```
+输入: S = "ADOBECODEBANC", T = "ABC"
+输出: "BANC"
+```
+
+**说明：**
+
+- 如果 S 中不存这样的子串，则返回空字符串 `""`。
+- 如果 S 中存在这样的子串，我们保证它是唯一的答案。
+
+**Solution：**
+
+```java
+public class Solution {
+    public String minWindow(String s, String t) {
+        if (s == null || t == null || s.length() < t.length()) {
+            return "";
+        }
+
+        String res = "";
+        int[] sFlag = new int[256];
+        int[] tFlag = new int[256];
+        for (int i = 0; i < t.length(); i++) {
+            tFlag[t.charAt(i)]++;
+        }
+        int count = t.length();
+        int l = 0;
+        int r = 0;
+        while (l <= s.length() - t.length()) {
+            if (count > 0 && r < s.length()) {
+                if (sFlag[s.charAt(r)]++ < tFlag[s.charAt(r++)]) {
+                    count--;
+                }
+            } else {
+                if (count == 0 && (res.length() == 0 || r - l < res.length())) {
+                    res = s.substring(l, r);
+                }
+                if (sFlag[s.charAt(l)]-- <= tFlag[s.charAt(l++)]) {
+                    count++;
+                }
+            }
+        }
+        return res;
     }
 }
 ```
