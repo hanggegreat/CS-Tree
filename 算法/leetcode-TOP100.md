@@ -1477,6 +1477,150 @@ public class Solution {
 **Solution：**
 
 ```java
+/*
+* 从后往前跳
+*/
+public class Solution {
+    public boolean canJump(int[] nums) {
+        int last = nums.length - 1;
+        for (int i = nums.length - 1; i >= 0; i--) {
+            if (nums[i] + i >= last) {
+                last = i;
+            }
+        }
+        return last == 0;
+    }
+}
+```
+
+### 56.合并区间
+
+**题目描述：**
+
+给出一个区间的集合，请合并所有重叠的区间。
+
+**示例 1:**
+
+```
+输入: [[1,3],[2,6],[8,10],[15,18]]
+输出: [[1,6],[8,10],[15,18]]
+解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+```
+
+**示例 2:**
+
+```HTML
+输入: [[1,4],[4,5]]
+输出: [[1,5]]
+解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public List<Interval> merge(List<Interval> intervals) {
+        if (intervals == null || intervals.size() < 2) {
+            return intervals;
+        }
+
+        List<Interval> list = new ArrayList<>();
+        intervals.sort(Comparator.comparingInt(interval -> interval.start));
+
+        Interval pre = null;
+        for (Interval interval : intervals) {
+            if (pre == null || pre.end < interval.start) {
+                list.add(interval);
+                pre = interval;
+            } else {
+                pre.end = Math.max(pre.end, interval.end);
+            }
+        }
+        return list;
+    }
+}
+```
+
+### 62.不同路径
+
+**题目描述：**
+
+一个机器人位于一个 *m x n* 网格的左上角 （起始点在下图中标记为“Start” ）。
+
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。
+
+问总共有多少条不同的路径？
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/22/robot_maze.png)
+
+例如，上图是一个7 x 3 的网格。有多少可能的路径？
+
+**说明：***m* 和 *n* 的值均不超过 100。
+
+**示例 1:**
+
+```
+输入: m = 3, n = 2
+输出: 3
+解释:
+从左上角开始，总共有 3 条路径可以到达右下角。
+1. 向右 -> 向右 -> 向下
+2. 向右 -> 向下 -> 向右
+3. 向下 -> 向右 -> 向右
+```
+
+**示例 2:**
+
+```html
+输入: m = 7, n = 3
+输出: 28
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == 0 || j == 0) {
+                    dp[i][j] = 1;
+                } else {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+            }
+        }
+        
+        return dp[m - 1][n - 1];
+    }
+}
+```
+
+### 64.最小路径和
+
+**题目描述：**
+
+给定一个包含非负整数的 *m* x *n* 网格，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+
+**说明：**每次只能向下或者向右移动一步。
+
+**示例:**
+
+```HTML
+输入:
+[
+  [1,3,1],
+  [1,5,1],
+  [4,2,1]
+]
+输出: 7
+解释: 因为路径 1→3→1→1→1 的总和最小。
+```
+
+**Solution：**
+
+```java
 
 ```
 
