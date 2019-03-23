@@ -82,6 +82,10 @@
 
 [102.二叉树的层序遍历](#102二叉树的层序遍历)
 
+[104.二叉树的最大深度](#104二叉树的最大深度)
+
+[105.从前序与中序遍历序列构造二叉树](#105从前序与中序遍历序列构造二叉树)
+
 
 
 ### 1.两数之和
@@ -2323,6 +2327,157 @@ public class Solution {
             return false;
         }
         return left.val == right.val && isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
+    }
+}
+```
+
+### 102.二叉树的层序遍历
+
+**题目描述：**
+
+给定一个二叉树，返回其按层次遍历的节点值。 （即逐层地，从左到右访问所有节点）。
+
+例如:
+给定二叉树: `[3,9,20,null,null,15,7]`,
+
+```
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回其层次遍历结果：
+
+```HTML
+[
+  [3],
+  [9,20],
+  [15,7]
+]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null) {
+            return res;
+        }
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            List<Integer> list = new ArrayList<>();
+            while (size-- > 0) {
+                TreeNode node = queue.poll();
+                list.add(node.val);
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+            res.add(list);
+        }
+        
+        return res;
+    }
+}
+```
+
+### 104.二叉树的最大深度
+
+**题目描述：**
+
+给定一个二叉树，找出其最大深度。
+
+二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+
+**说明:** 叶子节点是指没有子节点的节点。
+
+**示例：**
+给定二叉树 `[3,9,20,null,null,15,7]`，
+
+```
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回它的最大深度 3 。
+
+**Solution：**
+
+```java
+public class Solution {
+    public int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+    }
+}
+```
+
+### 105.从前序遍历和中序遍历序列构造二叉树
+
+**题目描述：**
+
+根据一棵树的前序遍历与中序遍历构造二叉树。
+
+**注意:**
+你可以假设树中没有重复的元素。
+
+例如，给出
+
+```
+前序遍历 preorder = [3,9,20,15,7]
+中序遍历 inorder = [9,3,15,20,7]
+```
+
+返回如下的二叉树：
+
+```html
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder == null || inorder == null || preorder.length != inorder.length || preorder.length == 0) {
+            return null;
+        }
+        return build(preorder, inorder, 0, preorder.length - 1, 0, inorder.length - 1);
+    }
+
+    private TreeNode build(int[] preorder, int[] inorder, int ps, int pe, int is, int ie) {
+        if (ps > pe || is > ie) {
+            return null;
+        }
+
+        TreeNode node = new TreeNode(preorder[ps]);
+        for (int i = is; i <= ie; i++) {
+            if (inorder[i] == preorder[ps]) {
+                node.left = build(preorder, inorder, ps + 1, i - is + ps, is, i - 1);
+                node.right = build(preorder, inorder, i - is + ps + 1, pe, i + 1, ie);
+                return node;
+            }
+        }
+        return node;
     }
 }
 ```
