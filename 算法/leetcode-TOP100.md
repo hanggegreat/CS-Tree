@@ -1947,3 +1947,130 @@ public class Solution {
 }
 ```
 
+### 79.单词搜索
+
+**题目描述：**
+
+给定一个二维网格和一个单词，找出该单词是否存在于网格中。
+
+单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
+
+**示例:**
+
+```html
+board =
+[
+  ['A','B','C','E'],
+  ['S','F','C','S'],
+  ['A','D','E','E']
+]
+
+给定 word = "ABCCED", 返回 true.
+给定 word = "SEE", 返回 true.
+给定 word = "ABCB", 返回 false.
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    private boolean[][] visited;
+    private int index = 0;
+
+    public boolean exist(char[][] board, String word) {
+        if (board == null || board.length == 0 || board[0].length == 0 || word == null) {
+            return false;
+        }
+
+        visited = new boolean[board.length][board[0].length];
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (exit(board, word, i, j)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean exit(char[][] board, String word, int row, int col) {
+        if (index == word.length()) {
+            return true;
+        }
+
+        boolean flag = false;
+        if (col >= 0 && col < board[0].length
+                && row >= 0 && row < board.length
+                && !visited[row][col] && board[row][col] == word.charAt(index)) {
+            visited[row][col] = true;
+            index++;
+            flag = exit(board, word, row + 1, col)
+                    || exit(board, word, row - 1, col)
+                    || exit(board, word, row, col + 1)
+                    || exit(board, word, row, col - 1);
+            if (!flag) {
+                index--;
+                visited[row][col] = false;
+            }
+        }
+        return flag;
+    }
+}
+```
+
+### 84.柱状图中最大的矩形
+
+**题目描述：**
+
+给定 *n* 个非负整数，用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 1 。
+
+求在该柱状图中，能够勾勒出来的矩形的最大面积。
+
+ 
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/histogram.png)
+
+以上是柱状图的示例，其中每个柱子的宽度为 1，给定的高度为 `[2,1,5,6,2,3]`。
+
+ 
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/histogram_area.png)
+
+图中阴影部分为所能勾勒出的最大矩形面积，其面积为 `10` 个单位。
+
+ 
+
+**示例:**
+
+```
+输入: [2,1,5,6,2,3]
+输出: 10
+```
+
+**Solution：**
+
+```java
+/**
+ * 单调栈
+ */
+public class Solution {
+    public int largestRectangleArea(int[] heights) {
+        if (heights == null || heights.length == 0) {
+            return 0;
+        }
+
+        Stack<Integer> stack = new Stack<>();
+        int res = 0;
+        for (int i = 0; i <= heights.length; i++) {
+            int currentHeight = i == heights.length ? -1 : heights[i];
+            while (!stack.isEmpty() && currentHeight <= heights[stack.peek()]) {
+                int stackHeight = heights[stack.pop()];
+                res = Math.max(res, stackHeight * (stack.isEmpty() ? i : i - stack.peek() - 1));
+            }
+            stack.push(i);
+        }
+        return res;
+    }
+}
+```
+
