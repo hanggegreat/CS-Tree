@@ -86,6 +86,8 @@
 
 [105.从前序与中序遍历序列构造二叉树](#105从前序与中序遍历序列构造二叉树)
 
+[114.二叉树展开为链表](#114二叉树展开为链表)
+
 
 
 ### 1.两数之和
@@ -2478,6 +2480,59 @@ public class Solution {
             }
         }
         return node;
+    }
+}
+```
+
+### 114.二叉树展开为链表
+
+**题目描述：**
+
+给定一个二叉树，[原地](https://baike.baidu.com/item/%E5%8E%9F%E5%9C%B0%E7%AE%97%E6%B3%95/8010757)将它展开为链表。
+
+例如，给定二叉树
+
+```
+    1
+   / \
+  2   5
+ / \   \
+3   4   6
+```
+
+将其展开为：
+
+```
+1
+ \
+  2
+   \
+    3
+     \
+      4
+       \
+        5
+         \
+          6
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    private TreeNode last = new TreeNode(0);
+
+    public void flatten(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        last.right = root;
+        last.left = null;
+        last = last.right;
+        TreeNode temp = root.right;
+        
+        flatten(root.left);
+        flatten(temp);
     }
 }
 ```
