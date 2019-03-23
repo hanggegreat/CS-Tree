@@ -2074,3 +2074,123 @@ public class Solution {
 }
 ```
 
+### 85.最大矩形
+
+**题目描述：**
+
+给定一个仅包含 0 和 1 的二维二进制矩阵，找出只包含 1 的最大矩形，并返回其面积。
+
+**示例:**
+
+```HTML
+输入:
+[
+  ["1","0","1","0","0"],
+  ["1","0","1","1","1"],
+  ["1","1","1","1","1"],
+  ["1","0","0","1","0"]
+]
+输出: 6
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return 0;
+        }
+
+        int res = 0;
+        int[] height = new int[matrix[0].length];
+
+        for (int i = 0; i < matrix.length; i++) {
+            Stack<Integer> stack = new Stack<>();
+            for (int j = 0; j <= height.length; j++) {
+                if (j < height.length) {
+                    height[j] = (matrix[i][j] == '1') ? 1 + height[j] : 0;
+                }
+                int curHeight = j == height.length ? -1 : height[j];
+                while (!stack.isEmpty() && curHeight <= height[stack.peek()]) {
+                    int stackHeight = height[stack.pop()];
+                    int width = stack.isEmpty() ? j : j - stack.peek() - 1;
+                    res = Math.max(res, width * stackHeight);
+                }
+                stack.push(j);
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 94.二叉树的中序遍历
+
+**题目描述：**
+
+给定一个二叉树，返回它的*中序* 遍历。
+
+**示例:**
+
+```HTML
+输入: [1,null,2,3]
+   1
+    \
+     2
+    /
+   3
+
+输出: [1,3,2]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode node = root;
+        while (!stack.isEmpty() || node != null) {
+            while (node != null) {
+                stack.push(node);
+                node = node.left;
+            }
+            node = stack.pop();
+            res.add(node.val);
+            node = node.right;
+        }
+        
+        return res;
+    }
+}
+```
+
+### 96.不同的二叉搜索树
+
+**题目描述：**
+
+给定一个整数 *n*，求以 1 ... *n* 为节点组成的二叉搜索树有多少种？
+
+**示例:**
+
+```HTML
+输入: 3
+输出: 5
+解释:
+给定 n = 3, 一共有 5 种不同结构的二叉搜索树:
+
+   1         3     3      2      1
+    \       /     /      / \      \
+     3     2     1      1   3      2
+    /     /       \                 \
+   2     1         2                 3
+```
+
+**Solution：**
+
+```java
+
+```
+
