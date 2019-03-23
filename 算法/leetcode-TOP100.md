@@ -72,6 +72,16 @@
 
 [85.最大矩形](#85最大矩形)
 
+[94.二叉树的中序遍历](#94二叉树的中序遍历)
+
+[96.不同的二叉搜索树](#96不同的二叉搜索树)
+
+[98.验证二叉搜索树](#98验证二叉搜索树)
+
+[101.对称二叉树](#101对称二叉树)
+
+[102.二叉树的层序遍历](#102二叉树的层序遍历)
+
 
 
 ### 1.两数之和
@@ -2191,6 +2201,129 @@ public class Solution {
 **Solution：**
 
 ```java
+public class Solution {
+    public int numTrees(int n) {
+        int[] dp = new int[n + 1];
+        dp[0] = 1;
+        dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            for (int j = 0; j < i; j++) {
+                dp[i] += dp[j] * dp[i - j - 1];
+            }
+        }
+        return dp[n];
+    }
+}
+```
 
+### 98.验证二叉搜索树
+
+**题目描述：**
+
+给定一个二叉树，判断其是否是一个有效的二叉搜索树。
+
+假设一个二叉搜索树具有如下特征：
+
+- 节点的左子树只包含**小于**当前节点的数。
+- 节点的右子树只包含**大于**当前节点的数。
+- 所有左子树和右子树自身必须也是二叉搜索树。
+
+**示例 1:**
+
+```
+输入:
+    2
+   / \
+  1   3
+输出: true
+```
+
+**示例 2:**
+
+```html
+输入:
+    5
+   / \
+  1   4
+     / \
+    3   6
+输出: false
+解释: 输入为: [5,1,4,null,null,3,6]。
+     根节点的值为 5 ，但是其右子节点值为 4 。
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public boolean isValidBST(TreeNode root) {
+        TreeNode pre = null;
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode node = root;
+        
+        while (!stack.isEmpty() || node != null) {
+            while (node != null) {
+                stack.push(node);
+                node = node.left;
+            }
+            node = stack.pop();
+            if (pre != null && pre.val >= node.val) {
+                return false;
+            }
+            pre = node;
+            node = node.right;
+        }
+        return true;
+    }
+}
+```
+
+### 101.对称二叉树
+
+**题目描述：**
+
+给定一个二叉树，检查它是否是镜像对称的。
+
+例如，二叉树 `[1,2,2,3,4,4,3]` 是对称的。
+
+```
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+```
+
+但是下面这个 `[1,2,2,null,3,null,3]` 则不是镜像对称的:
+
+```HTML
+    1
+   / \
+  2   2
+   \   \
+   3    3
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+        return isSymmetric(root.left, root.right);
+    }
+    
+    private boolean isSymmetric(TreeNode left, TreeNode right) {
+        if (left == null && right == null) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return false;
+        }
+        return left.val == right.val && isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
+    }
+}
 ```
 
