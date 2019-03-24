@@ -4026,3 +4026,85 @@ public class Solution {
 }
 ```
 
+### 240.搜索二维矩阵II
+
+**题目描述：**
+
+编写一个高效的算法来搜索 *m* x *n* 矩阵 matrix 中的一个目标值 target。该矩阵具有以下特性：
+
+- 每行的元素从左到右升序排列。
+- 每列的元素从上到下升序排列。
+
+**示例:**
+
+现有矩阵 matrix 如下：
+
+```
+[
+  [1,   4,  7, 11, 15],
+  [2,   5,  8, 12, 19],
+  [3,   6,  9, 16, 22],
+  [10, 13, 14, 17, 24],
+  [18, 21, 23, 26, 30]
+]
+```
+
+给定 target = `5`，返回 `true`。
+
+给定 target = `20`，返回 `false`。
+
+**Solution：**
+
+```java
+public class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return false;
+        }
+        
+        int i = matrix.length - 1;
+        int j = 0;
+        while (i >= 0 && j < matrix[0].length) {
+            if (matrix[i][j] == target) {
+                return true;
+            }
+            
+            if (matrix[i][j] > target) {
+                i--;
+            } else {
+                j++;
+            }
+        }
+        return false;
+    }
+}
+```
+
+### 279.完全平方数
+
+**题目描述：**
+
+给定正整数 *n*，找到若干个完全平方数（比如 `1, 4, 9, 16, ...`）使得它们的和等于 *n*。你需要让组成和的完全平方数的个数最少。
+
+**示例 1:**
+
+```
+输入: n = 12
+输出: 3 
+解释: 12 = 4 + 4 + 4.
+```
+
+**示例 2:**
+
+```
+输入: n = 13
+输出: 2
+解释: 13 = 4 + 9.
+```
+
+**Solution：**
+
+```java
+
+```
+
