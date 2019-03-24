@@ -88,6 +88,68 @@
 
 [114.二叉树展开为链表](#114二叉树展开为链表)
 
+[121.买股票的最佳时机](#121买股票的最佳时机)
+
+[124.二叉树中的最大路径和](#124二叉树中的最大路径和)
+
+[128.最长连续序列](#128最长连续序列)
+
+[136.只出现一次的数字](#136只出现一次的数字)
+
+[139.单词拆分](#139单词拆分)
+
+[141.环形链表](#141环形链表)
+
+[142.环形链表Ⅱ](#142环形链表Ⅱ)
+
+[146.LRU缓存机制](#146LRU缓存机制)
+
+[148.排序链表](#148排序链表)
+
+[152.乘积最大子序列](#152乘积最大子序列)
+
+[155.最小栈](#155最小栈)
+
+[160.相交链表](#160相交链表)
+
+[169.求众数](#169求众数)
+
+[198.打家劫舍](#198打家劫舍)
+
+[200.岛屿的个数](#200岛屿的个数)
+
+[206.翻转链表](#206翻转链表)
+
+[207.课程表](#207课程表)
+
+[208.实现Trie(前缀树)](#208实现Trie(前缀树))
+
+[215.数组中的第K个最大元素](#215数组中的第K个最大元素)
+
+[221.最大正方形](#221最大正方形)
+
+[226.翻转二叉树](#226翻转二叉树)
+
+[234.回文链表](#234回文链表)
+
+[236.二叉搜索树的最近公共祖先](#236二叉搜索树的最近公共祖先)
+
+[238.除自身以外数组的乘积](#238除自身以外数组的乘积)
+
+[239.滑动窗口的最大值](#239滑动窗口的最大值)
+
+[240.搜索二维矩阵Ⅱ](#240搜索二维矩阵Ⅱ)
+
+[279.完全平方数](#279完全平方数)
+
+[283.移动零](#283移动零)
+
+[287.寻找重复数](#287寻找重复数)
+
+[297.二叉树的序列化和反序列化](#297二叉树的序列化和反序列化)
+
+[300.最长上升子序列](#300.最长上升子序列)
+
 
 
 ### 1.两数之和
@@ -3141,6 +3203,132 @@ public class MinStack {
     
     public int getMin() {
         return minStack.peek();
+    }
+}
+```
+
+### 160.相交链表
+
+**题目描述：**
+
+编写一个程序，找到两个单链表相交的起始节点。
+
+如下面的两个链表**：**
+
+[![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png)](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png)
+
+在节点 c1 开始相交。
+
+ 
+
+**示例 1：**
+
+[![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_1.png)](https://assets.leetcode.com/uploads/2018/12/13/160_example_1.png)
+
+```
+输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
+输出：Reference of the node with value = 8
+输入解释：相交节点的值为 8 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。
+```
+
+ 
+
+**示例 2：**
+
+[![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_2.png)](https://assets.leetcode.com/uploads/2018/12/13/160_example_2.png)
+
+```
+输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+输出：Reference of the node with value = 2
+输入解释：相交节点的值为 2 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
+```
+
+ 
+
+**示例 3：**
+
+[![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_3.png)](https://assets.leetcode.com/uploads/2018/12/13/160_example_3.png)
+
+```
+输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+输出：null
+输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
+解释：这两个链表不相交，因此返回 null。
+```
+
+ 
+
+**注意：**
+
+- 如果两个链表没有交点，返回 `null`.
+- 在返回结果后，两个链表仍须保持原有的结构。
+- 可假定整个链表结构中没有循环。
+- 程序尽量满足 O(*n*) 时间复杂度，且仅用 O(*1*) 内存。
+
+**Solution：**
+
+```java
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) {
+            return null;
+        }
+        
+        ListNode a = headA;
+        ListNode b = headB;
+        while (a != b) {
+            a = a == null ? headB : a.next;
+            b = b == null ? headA : b.next;
+        }
+        return a;
+    }
+}
+```
+
+### 169.求众数
+
+**题目描述：**
+
+给定一个大小为 *n* 的数组，找到其中的众数。众数是指在数组中出现次数**大于** `⌊ n/2 ⌋` 的元素。
+
+你可以假设数组是非空的，并且给定的数组总是存在众数。
+
+**示例 1:**
+
+```
+输入: [3,2,3]
+输出: 3
+```
+
+**示例 2:**
+
+```
+输入: [2,2,1,1,1,2,2]
+输出: 2
+```
+
+**Solution：**
+
+```java
+/**
+* 摩尔投票法
+*/
+public class Solution {
+    public int majorityElement(int[] nums) {
+        int count = 1;
+        int res = nums[0];
+        for (int num : nums) {
+            if (num == res) {
+                count++;
+            } else {
+                if (count == 1) {
+                    res = num;
+                } else {
+                    count--;
+                }
+            }
+        }
+        return res;
     }
 }
 ```
