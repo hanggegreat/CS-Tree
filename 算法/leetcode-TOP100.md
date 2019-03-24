@@ -2953,6 +2953,90 @@ cache.get(4);       // 返回  4
 **Solution：**
 
 ```java
+public class LRUCache {
+    private LinkedHashMap<Integer, Integer> map;
+    private int capacity;
 
+    public LRUCache(int capacity) {
+        map = new LinkedHashMap<Integer, Integer>(16, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry eldest) {
+                return size() > LRUCache.this.capacity;
+            }
+        };
+        this.capacity = capacity;
+    }
+
+    public int get(int key) {
+        return map.getOrDefault(key, -1);
+    }
+
+    public void put(int key, int value) {
+        map.put(key, value);
+    }
+}
+```
+
+### 148.排序链表
+
+**题目描述：**
+
+在 *O*(*n* log *n*) 时间复杂度和常数级空间复杂度下，对链表进行排序。
+
+**示例 1:**
+
+```
+输入: 4->2->1->3
+输出: 1->2->3->4
+```
+
+**示例 2:**
+
+```html
+输入: -1->5->3->4->0
+输出: -1->0->3->4->5
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode mid = getMid(head);
+        ListNode second = mid.next;
+        mid.next = null;
+        return merge(sortList(head), sortList(second));
+    }
+    
+    private ListNode merge(ListNode first, ListNode second) {
+        ListNode dummy = new ListNode(0);
+        ListNode pre = dummy;
+        while (first != null && second != null) {
+            if (first.val > second.val) {
+                pre.next = second;
+                second = second.next;
+            } else {
+                pre.next = first;
+                first = first.next;
+            }
+            pre = pre.next;
+        }
+        pre.next = first == null ? second : first;
+        return dummy.next;
+    }
+    
+    private ListNode getMid(ListNode head) {
+        ListNode fast = head;
+        ListNode slow = head;
+        while (fast.next != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+}
 ```
 
