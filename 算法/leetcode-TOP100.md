@@ -3415,6 +3415,80 @@ public class Solution {
 **Solution：**
 
 ```java
+public class Solution {
+    private boolean[][] visited;
+    
+    public int numIslands(char[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+        
+        int res = 0;
+        visited = new boolean[grid.length][grid[0].length];
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == '1' && !visited[i][j]) {
+                    res++;
+                    dfs(grid, i, j);
+                }
+            }
+        }
+        
+        return res;
+    }
+    
+    private void dfs (char[][] grid, int row, int col) {
+        if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length || grid[row][col] == '0' || visited[row][col]) {
+            return;
+        }
+        
+        visited[row][col] = true;
+        dfs(grid, row + 1, col);
+        dfs(grid, row - 1, col);
+        dfs(grid, row, col + 1);
+        dfs(grid, row, col - 1);
+    }
+}
+```
 
+### 206.反转链表
+
+**题目描述：**
+
+反转一个单链表。
+
+**示例:**
+
+```html
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    // 解法一
+    public ListNode reverseList(ListNode head) {
+        ListNode dummy = new ListNode(0);
+        while (head != null) {
+            ListNode next = head.next;
+            head.next = dummy.next;
+            dummy.next = head;
+            head = next;
+        }
+        return dummy.next;
+    }
+	// 解法二
+        public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode newHead = reverseList(head.next);
+        head.next.next = head;
+        head.next = null;
+        return newHead;
+    }
+}
 ```
 
