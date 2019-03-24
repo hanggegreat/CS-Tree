@@ -2642,3 +2642,317 @@ public class Solution {
 }
 ```
 
+### 128.最长连续序列
+
+**题目描述：**
+
+给定一个未排序的整数数组，找出最长连续序列的长度。
+
+要求算法的时间复杂度为 *O(n)*。
+
+**示例:**
+
+```html
+输入: [100, 4, 200, 1, 3, 2]
+输出: 4
+解释: 最长连续序列是 [1, 2, 3, 4]。它的长度为 4。
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int longestConsecutive(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+
+        // 以key开始，连续序列长度为value
+        Map<Integer, Integer> map = new HashMap<>();
+        int res = 0;
+        for (int num : nums) {
+            if (map.containsKey(num)) {
+                continue;
+            }
+            map.put(num, 1 + map.getOrDefault(num + 1, 0));
+            // 更新其左边相邻元素的连续序列长度
+            while (map.containsKey(num - 1)) {
+                map.put(num - 1, map.get(num--) + 1);
+            }
+        }
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            res = Math.max(res, entry.getValue());
+        }
+        return res;
+    }
+}
+```
+
+### 136.只出现一次的数字
+
+**题目描述：**
+
+给定一个**非空**整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+
+**说明：**
+
+你的算法应该具有线性时间复杂度。 你可以不使用额外空间来实现吗？
+
+**示例 1:**
+
+```
+输入: [2,2,1]
+输出: 1
+```
+
+**示例 2:**
+
+```
+输入: [4,1,2,1,2]
+输出: 4
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int singleNumber(int[] nums) {
+        int res = 0;
+        for (int num : nums) {
+            res ^= num;
+        }
+        return res;
+    }
+}
+```
+
+### 139.单词拆分
+
+**题目描述：**
+
+给定一个**非空**字符串 *s* 和一个包含**非空**单词列表的字典 *wordDict*，判定 *s* 是否可以被空格拆分为一个或多个在字典中出现的单词。
+
+**说明：**
+
+- 拆分时可以重复使用字典中的单词。
+- 你可以假设字典中没有重复的单词。
+
+**示例 1：**
+
+```
+输入: s = "leetcode", wordDict = ["leet", "code"]
+输出: true
+解释: 返回 true 因为 "leetcode" 可以被拆分成 "leet code"。
+```
+
+**示例 2：**
+
+```
+输入: s = "applepenapple", wordDict = ["apple", "pen"]
+输出: true
+解释: 返回 true 因为 "applepenapple" 可以被拆分成 "apple pen apple"。
+     注意你可以重复使用字典中的单词。
+```
+
+**示例 3：**
+
+```html
+输入: s = "catsandog", wordDict = ["cats", "dog", "sand", "and", "cat"]
+输出: false
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public boolean wordBreak(String s, List<String> wordDict) {
+        if (s == null || "".equals(s)) {
+            return true;
+        }
+        
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true;
+        
+        for (int i = 1; i <= s.length(); i++) {
+            for (int j = 0; j < i; j++) {
+                String sub = s.substring(j, i);
+                if (dp[j] && wordDict.contains(sub)) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[s.length()];
+    }
+}
+```
+
+### 141.环形链表
+
+**题目描述：**
+
+给定一个链表，判断链表中是否有环。
+
+为了表示给定链表中的环，我们使用整数 `pos` 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 `pos` 是 `-1`，则在该链表中没有环。
+
+ 
+
+**示例 1：**
+
+```
+输入：head = [3,2,0,-4], pos = 1
+输出：true
+解释：链表中有一个环，其尾部连接到第二个节点。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist.png)
+
+**示例 2：**
+
+```
+输入：head = [1,2], pos = 0
+输出：true
+解释：链表中有一个环，其尾部连接到第一个节点。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test2.png)
+
+**示例 3：**
+
+```
+输入：head = [1], pos = -1
+输出：false
+解释：链表中没有环。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test3.png)
+
+**Solution：**
+
+```java
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        if (head == null) {
+            return false;
+        }
+        
+        ListNode fast = head;
+        ListNode slow = head;
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) {
+                break;
+            }
+        }
+        return fast != null && fast.next != null;
+    }
+}
+```
+
+### 142.环形链表Ⅱ
+
+**题目描述：**
+
+给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 `null`。
+
+为了表示给定链表中的环，我们使用整数 `pos` 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 `pos` 是 `-1`，则在该链表中没有环。
+
+**说明：**不允许修改给定的链表。
+
+ 
+
+**示例 1：**
+
+```
+输入：head = [3,2,0,-4], pos = 1
+输出：tail connects to node index 1
+解释：链表中有一个环，其尾部连接到第二个节点。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist.png)
+
+**示例 2：**
+
+```
+输入：head = [1,2], pos = 0
+输出：tail connects to node index 0
+解释：链表中有一个环，其尾部连接到第一个节点。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test2.png)
+
+**示例 3：**
+
+```
+输入：head = [1], pos = -1
+输出：no cycle
+解释：链表中没有环。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test3.png)
+
+**Solution：**
+
+```java
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        ListNode fast = head;
+        ListNode slow = head;
+        
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (fast == slow) {
+                break;
+            }
+        }
+        if (fast == null || fast.next == null) {
+            return null;
+        }
+        
+        slow = head;
+        while (slow != fast) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+        return fast;
+    }
+}
+```
+
+### 146.LRU缓存机制
+
+**题目描述：**
+
+运用你所掌握的数据结构，设计和实现一个  [LRU (最近最少使用) 缓存机制](https://baike.baidu.com/item/LRU)。它应该支持以下操作： 获取数据 `get` 和 写入数据 `put` 。
+
+获取数据 `get(key)` - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。
+写入数据 `put(key, value)` - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
+
+**进阶:**
+
+你是否可以在 **O(1)** 时间复杂度内完成这两种操作？
+
+**示例:**
+
+```java
+LRUCache cache = new LRUCache( 2 /* 缓存容量 */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 返回  1
+cache.put(3, 3);    // 该操作会使得密钥 2 作废
+cache.get(2);       // 返回 -1 (未找到)
+cache.put(4, 4);    // 该操作会使得密钥 1 作废
+cache.get(1);       // 返回 -1 (未找到)
+cache.get(3);       // 返回  3
+cache.get(4);       // 返回  4
+```
+
+**Solution：**
+
+```java
+
+```
+
