@@ -3492,3 +3492,234 @@ public class Solution {
 }
 ```
 
+### 207.课程表
+
+现在你总共有 *n* 门课需要选，记为 `0` 到 `n-1`。
+
+在选修某些课程之前需要一些先修课程。 例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示他们: `[0,1]`
+
+给定课程总量以及它们的先决条件，判断是否可能完成所有课程的学习？
+
+**示例 1:**
+
+```
+输入: 2, [[1,0]] 
+输出: true
+解释: 总共有 2 门课程。学习课程 1 之前，你需要完成课程 0。所以这是可能的。
+```
+
+**示例 2:**
+
+```
+输入: 2, [[1,0],[0,1]]
+输出: false
+解释: 总共有 2 门课程。学习课程 1 之前，你需要先完成课程 0；并且学习课程 0 之前，你还应先完成课程 1。这是不可能的。
+```
+
+**说明:**
+
+1. 输入的先决条件是由**边缘列表**表示的图形，而不是邻接矩阵。详情请参见[图的表示法](http://blog.csdn.net/woaidapaopao/article/details/51732947)。
+2. 你可以假定输入的先决条件中没有重复的边。
+
+**提示:**
+
+1. 这个问题相当于查找一个循环是否存在于有向图中。如果存在循环，则不存在拓扑排序，因此不可能选取所有课程进行学习。
+2. [通过 DFS 进行拓扑排序](https://www.coursera.org/specializations/algorithms) - 一个关于Coursera的精彩视频教程（21分钟），介绍拓扑排序的基本概念。
+3. 拓扑排序也可以通过 [BFS](https://baike.baidu.com/item/%E5%AE%BD%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/5224802?fr=aladdin&fromid=2148012&fromtitle=%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2) 完成。
+
+**Solution：**
+
+```java
+public class Solution {
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        // 邻接表图
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        // 保存入度
+        int[] degree = new int[numCourses];
+        //构建有向图
+        for (int[] pre : prerequisites) {
+            if (map.containsKey(pre[1])) {
+                map.get(pre[1]).add(pre[0]);
+            } else {
+                map.put(pre[1], new ArrayList<>(Arrays.asList(pre[0])));
+            }
+            degree[pre[0]]++;
+        }
+        
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (degree[i] == 0) {
+                queue.offer(i);
+            }
+        }
+        // BFS
+        while (!queue.isEmpty()) {
+            int i = queue.poll();
+            List<Integer> l = map.get(i);
+            if(l == null) {
+                continue;
+            }
+            for (int j = 0; j < l.size(); j++) {
+                int p = l.get(j);
+                degree[p]--;
+                if(degree[p] == 0) {
+                    queue.offer(p);
+                }
+            }
+        }
+        for (int i = 0; i < numCourses; i++) {
+            if (degree[i] != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+### 208.实现Trie(前缀树)
+
+**题目描述：**
+
+实现一个 Trie (前缀树)，包含 `insert`, `search`, 和 `startsWith` 这三个操作。
+
+**示例:**
+
+```
+Trie trie = new Trie();
+
+trie.insert("apple");
+trie.search("apple");   // 返回 true
+trie.search("app");     // 返回 false
+trie.startsWith("app"); // 返回 true
+trie.insert("app");   
+trie.search("app");     // 返回 true
+```
+
+**说明:**
+
+- 你可以假设所有的输入都是由小写字母 `a-z` 构成的。
+- 保证所有输入均为非空字符串。
+
+**Solution：**
+
+```java
+public class Trie {
+    // 指向所有存在的下一个字符
+    private Map<Character, Map> map;
+
+    /**
+     * Initialize your data structure here.
+     */
+    public Trie() {
+        map = new HashMap<>();
+    }
+
+    /**
+     * Inserts a word into the trie.
+     */
+    public void insert(String word) {
+        Map<Character, Map> ws = map;
+        for (int i = 0; i < word.length(); i++) {
+            ws.putIfAbsent(word.charAt(i), new HashMap<>());
+            ws = ws.get(word.charAt(i));
+        }
+        ws.put('.', null);
+    }
+
+    /**
+     * Returns if the word is in the trie.
+     */
+    public boolean search(String word) {
+        Map<Character, Map> ws = map;
+        for (int i = 0; i < word.length(); i++) {
+            ws = ws.get(word.charAt(i));
+            if (ws == null) {
+                return false;
+            }
+        }
+        return ws.containsKey('.');
+    }
+
+    /**
+     * Returns if there is any word in the trie that starts with the given prefix.
+     */
+    public boolean startsWith(String prefix) {
+        Map<Character, Map> ws = map;
+        for (int i = 0; i < prefix.length(); i++) {
+            ws = ws.get(prefix.charAt(i));
+            if (ws == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+### 215.数组中的第K个最大元素
+
+**题目描述：**
+
+在未排序的数组中找到第 **k** 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+
+**示例 1:**
+
+```
+输入: [3,2,1,5,6,4] 和 k = 2
+输出: 5
+```
+
+**示例 2:**
+
+```
+输入: [3,2,3,1,2,4,5,5,6] 和 k = 4
+输出: 4
+```
+
+**说明:**
+
+你可以假设 k 总是有效的，且 1 ≤ k ≤ 数组的长度。
+
+**Solution：**
+
+```java
+public class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        Queue<Integer> queue = new PriorityQueue<>(Comparator.reverseOrder());
+        for (int num : nums) {
+            queue.offer(num);
+        }
+        for (int i = 1; i < k; i++) {
+            queue.poll();
+        }
+        return queue.peek();
+    }
+}
+```
+
+#### 221.最大正方形
+
+**题目描述：**
+
+在一个由 0 和 1 组成的二维矩阵内，找到只包含 1 的最大正方形，并返回其面积。
+
+**示例:**
+
+```html
+输入: 
+
+1 0 1 0 0
+1 0 1 1 1
+1 1 1 1 1
+1 0 0 1 0
+
+输出: 4
+```
+
+**Solution：**
+
+```java
+
+```
+
