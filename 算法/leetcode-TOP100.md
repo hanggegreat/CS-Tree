@@ -3698,7 +3698,7 @@ public class Solution {
 }
 ```
 
-#### 221.最大正方形
+### 221.最大正方形
 
 **题目描述：**
 
@@ -3715,6 +3715,108 @@ public class Solution {
 1 0 0 1 0
 
 输出: 4
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int maximalSquare(char[][] matrix) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return 0;
+        }
+        
+        int res = 0;
+        int[] heights = new int[matrix[0].length];
+        for (int i = 0; i < matrix.length; i++) {
+            Stack<Integer> stack = new Stack<>();
+            for (int j = 0; j <= heights.length; j++) {
+                if (j < heights.length) {
+                    heights[j] = (matrix[i][j] == '1') ? 1 + heights[j] : 0;
+                }
+                int height = (j == heights.length) ? -1 : heights[j];
+                while (!stack.isEmpty() && height <= heights[stack.peek()]) {
+                    int stackHeight = heights[stack.pop()];
+                    int width = stack.isEmpty() ? j : j - stack.peek() - 1;
+                    int min = Math.min(width, stackHeight);
+                    res = Math.max(res, min * min);
+                }
+                stack.push(j);
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 226.翻转二叉树
+
+**题目描述：**
+
+翻转一棵二叉树。
+
+**示例：**
+
+输入：
+
+```
+     4
+   /   \
+  2     7
+ / \   / \
+1   3 6   9
+```
+
+输出：
+
+```
+     4
+   /   \
+  7     2
+ / \   / \
+9   6 3   1
+```
+
+**备注:**
+这个问题是受到 [Max Howell ](https://twitter.com/mxcl)的 [原问题](https://twitter.com/mxcl/status/608682016205344768) 启发的 ：
+
+> 谷歌：我们90％的工程师使用您编写的软件(Homebrew)，但是您却无法在面试时在白板上写出翻转二叉树这道题，这太糟糕了。
+
+**Solution：**
+
+```java
+public class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) {
+            return root;
+        }
+        
+        TreeNode left = root.left;
+        root.left = invertTree(root.right);
+        root.right = invertTree(left);
+        return root;
+    }
+}
+```
+
+### 234.回文链表
+
+**题目描述：**
+
+请判断一个链表是否为回文链表。
+
+**示例 1:**
+
+```
+输入: 1->2
+输出: false
+```
+
+**示例 2:**
+
+```
+输入: 1->2->2->1
+输出: true
 ```
 
 **Solution：**
