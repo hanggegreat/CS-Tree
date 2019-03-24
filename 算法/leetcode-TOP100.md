@@ -4142,6 +4142,165 @@ public class Solution {
 2. 尽量减少操作次数。
 
 ```java
+public class Solution {
+    public void moveZeroes(int[] nums) {
+        if (nums == null) {
+            return;
+        }
+        
+        int k = 0;
+        for (int num : nums) {
+            if (num != 0) {
+                nums[k++] = num;
+            }
+        }
+        
+        for (int i = k; i < nums.length; i++) {
+            nums[i] = 0;
+        }
+    }
+}
+```
+
+### 287.寻找重复数
+
+**题目解析：**
+
+给定一个包含 *n* + 1 个整数的数组 *nums*，其数字都在 1 到 *n* 之间（包括 1 和 *n*），可知至少存在一个重复的整数。假设只有一个重复的整数，找出这个重复的数。
+
+**示例 1:**
+
+```
+输入: [1,3,4,2,2]
+输出: 2
+```
+
+**示例 2:**
+
+```
+输入: [3,1,3,4,2]
+输出: 3
+```
+
+**说明：**
+
+1. **不能**更改原数组（假设数组是只读的）。
+2. 只能使用额外的 *O*(1) 的空间。
+3. 时间复杂度小于 *O*(*n*2) 。
+4. 数组中只有一个重复的数字，但它可能不止重复出现一次。
+
+**Solution：**
+
+```java
+/**
+* 把数组看成链表，采用快慢指针法，寻找环的入口
+*/
+public class Solution {
+    public int findDuplicate(int[] nums) {
+        int fast = 0;
+        int slow = 0;
+        while (true) {
+            fast = nums[nums[fast]];
+            slow = nums[slow];
+            if (fast == slow) {
+                slow = 0;
+                while (nums[fast] != nums[slow]) {
+                    fast = nums[fast];
+                    slow = nums[slow];
+                }
+                return nums[slow];
+            }
+        }
+    }
+}
+```
+
+### 297.二叉树的序列化和反序列化
+
+**题目描述：**
+
+序列化是将一个数据结构或者对象转换为连续的比特位的操作，进而可以将转换后的数据存储在一个文件或者内存中，同时也可以通过网络传输到另一个计算机环境，采取相反方式重构得到原数据。
+
+请设计一个算法来实现二叉树的序列化与反序列化。这里不限定你的序列 / 反序列化算法执行逻辑，你只需要保证一个二叉树可以被序列化为一个字符串并且将这个字符串反序列化为原始的树结构。
+
+**示例:** 
+
+```
+你可以将以下二叉树：
+
+    1
+   / \
+  2   3
+     / \
+    4   5
+
+序列化为 "[1,2,3,null,null,4,5]"
+```
+
+**提示:** 这与 LeetCode 目前使用的方式一致，详情请参阅 [LeetCode 序列化二叉树的格式](https://leetcode-cn.com/faq/#binary-tree)。你并非必须采取这种方式，你也可以采用其他的方法解决这个问题。
+
+**说明:** 不要使用类的成员 / 全局 / 静态变量来存储状态，你的序列化和反序列化算法应该是无状态的。
+
+**Soution：**
+
+```java
+public class Codec {
+    private int index = -1;
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        if (root == null) {
+            return "#,";
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(root.val).append(',').append(serialize(root.left)).append(serialize(root.right));
+        return sb.toString();
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        if (data == null) {
+            return null;
+        }
+        return helper(data.split(","));
+    }
+    
+    private TreeNode helper(String[] strs) {
+        index++;
+        if ("#".equals(strs[index])) {
+            return null;
+        }
+        TreeNode node = new TreeNode(Integer.valueOf(strs[index]));
+        node.left = helper(strs);
+        node.right = helper(strs);
+        return node;
+    }
+}
+```
+
+### 300.最长上升子序列
+
+**题目描述：**
+
+给定一个无序的整数数组，找到其中最长上升子序列的长度。
+
+**示例:**
+
+```
+输入: [10,9,2,5,3,7,101,18]
+输出: 4 
+解释: 最长的上升子序列是 [2,3,7,101]，它的长度是 4。
+```
+
+**说明:**
+
+- 可能会有多种最长上升子序列的组合，你只需要输出对应的长度即可。
+- 你算法的时间复杂度应该为 O(*n2*) 。
+
+**Solution：**
+
+```java
 
 ```
 
