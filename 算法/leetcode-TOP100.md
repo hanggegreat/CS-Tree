@@ -3040,3 +3040,108 @@ public class Solution {
 }
 ```
 
+### 152.乘机最大子序列
+
+**题目描述：**
+
+给定一个整数数组 `nums` ，找出一个序列中乘积最大的连续子序列（该序列至少包含一个数）。
+
+**示例 1:**
+
+```
+输入: [2,3,-2,4]
+输出: 6
+解释: 子数组 [2,3] 有最大乘积 6。
+```
+
+**示例 2:**
+
+```
+输入: [-2,0,-1]
+输出: 0
+解释: 结果不能为 2, 因为 [-2,-1] 不是子数组。
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int maxProduct(int[] nums) {
+        int res = nums[0];
+        int max = 1;
+        int min = 1;
+        for (int num : nums) {
+            if (num < 0) {
+                int temp = min;
+                min = max;
+                max = temp;
+            }
+            max = Math.max(max * num, num);
+            min = Math.min(min * num, num);
+            res = Math.max(max, res);
+        }
+        
+        return res;
+    }
+}
+```
+
+### 155.最小栈
+
+**题目描述：**
+
+设计一个支持 push，pop，top 操作，并能在常数时间内检索到最小元素的栈。
+
+- push(x) -- 将元素 x 推入栈中。
+- pop() -- 删除栈顶的元素。
+- top() -- 获取栈顶元素。
+- getMin() -- 检索栈中的最小元素。
+
+**示例:**
+
+```html
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.getMin();   --> 返回 -3.
+minStack.pop();
+minStack.top();      --> 返回 0.
+minStack.getMin();   --> 返回 -2.
+```
+
+**Solution：**
+
+```java
+public class MinStack {
+    private Stack<Integer> stack = new Stack<>();
+    private Stack<Integer> minStack = new Stack<>();
+        
+    /** initialize your data structure here. */
+    public MinStack() {
+    }
+    
+    public void push(int x) {
+        stack.push(x);
+        if (minStack.isEmpty() || minStack.peek() > x) {
+            minStack.push(x);
+        } else {
+            minStack.push(minStack.peek());
+        }
+    }
+    
+    public void pop() {
+        minStack.pop();
+        stack.pop();
+    }
+    
+    public int top() {
+        return stack.peek();
+    }
+    
+    public int getMin() {
+        return minStack.peek();
+    }
+}
+```
+
