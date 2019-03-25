@@ -4982,3 +4982,348 @@ public class Solution {
 }
 ```
 
+### 494.目标和
+
+**题目描述：**
+
+给定一个非负整数数组，a1, a2, ..., an, 和一个目标数，S。现在你有两个符号 `+` 和 `-`。对于数组中的任意一个整数，你都可以从 `+` 或 `-`中选择一个符号添加在前面。
+
+返回可以使最终数组和为目标数 S 的所有添加符号的方法数。
+
+**示例 1:**
+
+```
+输入: nums: [1, 1, 1, 1, 1], S: 3
+输出: 5
+解释: 
+
+-1+1+1+1+1 = 3
++1-1+1+1+1 = 3
++1+1-1+1+1 = 3
++1+1+1-1+1 = 3
++1+1+1+1-1 = 3
+
+一共有5种方法让最终目标和为3。
+```
+
+**注意:**
+
+1. 数组的长度不会超过20，并且数组中的值全为正数。
+2. 初始的数组的和不会超过1000。
+3. 保证返回的最终结果为32位整数。
+
+**Solution：**
+
+```java
+public class Solution {
+    private int res = 0;
+    
+    public int findTargetSumWays(int[] nums, int S) {
+        helper(nums, 0, S);
+        return res;
+    }
+    
+    private void helper(int[] nums, int index, int S) {
+        if (index == nums.length) {
+            if (S == 0) {
+                res++;
+            }
+            return;
+        }
+        helper(nums, index + 1, S - nums[index]);
+        helper(nums, index + 1, S + nums[index]);
+    }
+}
+```
+
+### 538.把二叉搜索树转换为累加树
+
+**题目描述：**
+
+给定一个二叉搜索树（Binary Search Tree），把它转换成为累加树（Greater Tree)，使得每个节点的值是原来的节点值加上所有大于它的节点值之和。
+
+**例如：**
+
+```
+输入: 二叉搜索树:
+              5
+            /   \
+           2     13
+
+输出: 转换为累加树:
+             18
+            /   \
+          20     13
+```
+
+**Solution：**
+
+```java
+/**
+ * 按照 右子树 -> 根节点 ->  左子树 的顺序遍历，统计之前节点值的和，加到当前节点上
+ */
+public class Solution {
+    public TreeNode convertBST(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+
+        int sum = 0;
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode node = root;
+        while (!stack.isEmpty() || node != null) {
+            while (node != null) {
+                stack.push(node);
+                node = node.right;
+            }
+            node = stack.pop();
+            int val = node.val;
+            node.val += sum;
+            sum += val;
+            node = node.left;
+        }
+        return root;
+    }
+}
+```
+
+### 543.二叉树的直径
+
+**题目描述：**
+
+给定一棵二叉树，你需要计算它的直径长度。一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过根结点。
+
+**示例 :**
+给定二叉树
+
+```
+          1
+         / \
+        2   3
+       / \     
+      4   5    
+```
+
+返回 **3**, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
+
+**注意：**两结点之间的路径长度是以它们之间边的数目表示。
+
+**Solution：**
+
+```java
+public class Solution {
+    private int res = 0;
+    
+    public int diameterOfBinaryTree(TreeNode root) {
+        helper(root);
+        return res;
+    }
+    
+    private int helper(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        
+        int left = helper(root.left);
+        int right = helper(root.right);
+        res = Math.max(res, left + right);
+        return 1 + Math.max(left, right);
+    }
+}
+```
+
+### 560.和为K的子数组
+
+**题目描述：**
+
+给定一个整数数组和一个整数 **k，**你需要找到该数组中和为 **k** 的连续的子数组的个数。
+
+**示例 1 :**
+
+```
+输入:nums = [1,1,1], k = 2
+输出: 2 , [1,1] 与 [1,1] 为两种不同的情况。
+```
+
+**说明 :**
+
+1. 数组的长度为 [1, 20,000]。
+2. 数组中元素的范围是 [-1000, 1000] ，且整数 **k** 的范围是 [-1e7, 1e7]。
+
+**Solution：**
+
+```java
+public class Solution {
+    public int subarraySum(int[] nums, int k) {
+        if (nums == null || nums.length <= 0) {
+            return 0;
+        }
+        
+        int res = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, 1);
+        int sum = 0;
+        
+        for (int num : nums) {
+            sum += num;
+            // map.get(sum - k)表示从头开始，和为 sum - k的子数组个数
+            // 那么子数组后面到当前位置的元素和即为 sum - (sum - k) = k
+            res += map.getOrDefault(sum - k, 0);
+            map.put(sum, map.getOrDefault(sum, 0) + 1);
+        }
+        return res;
+    }
+}
+```
+
+### 572.另一个树的子树
+
+**题目描述：**
+
+给定两个非空二叉树 **s** 和 **t**，检验 **s** 中是否包含和 **t** 具有相同结构和节点值的子树。**s** 的一个子树包括 **s** 的一个节点和这个节点的所有子孙。**s** 也可以看做它自身的一棵子树。
+
+**示例 1:**
+给定的树 s:
+
+```
+     3
+    / \
+   4   5
+  / \
+ 1   2
+```
+
+给定的树 t：
+
+```
+   4 
+  / \
+ 1   2
+```
+
+返回 **true**，因为 t 与 s 的一个子树拥有相同的结构和节点值。
+
+**示例 2:**
+给定的树 s：
+
+```
+     3
+    / \
+   4   5
+  / \
+ 1   2
+    /
+   0
+```
+
+给定的树 t：
+
+```
+   4
+  / \
+ 1   2
+```
+
+返回 **false**。
+
+**Solution：**
+
+```java
+public class Solution {
+    public boolean isSubtree(TreeNode s, TreeNode t) {
+        if (s == null && t == null) {
+            return true;
+        }
+        if (s == null || t == null) {
+            return false;
+        }
+        return isSametree(s, t)
+                || isSubtree(s.left, t)
+                || isSubtree(s.right, t);
+    }
+
+    private boolean isSametree(TreeNode s, TreeNode t) {
+        if (s == null && t == null) {
+            return true;
+        }
+        if (s == null || t == null) {
+            return false;
+        }
+        return s.val == t.val && isSametree(s.left, t.left) && isSametree(s.right, t.right);
+    }
+}
+```
+
+### 581.最短无序连续子数组
+
+**题目描述：**
+
+给定一个整数数组，你需要寻找一个**连续的子数组**，如果对这个子数组进行升序排序，那么整个数组都会变为升序排序。
+
+你找到的子数组应是**最短**的，请输出它的长度。
+
+**示例 1:**
+
+```
+输入: [2, 6, 4, 8, 10, 9, 15]
+输出: 5
+解释: 你只需要对 [6, 4, 8, 10, 9] 进行升序排序，那么整个表都会变为升序排序。
+```
+
+**说明 :**
+
+1. 输入的数组长度范围在 [1, 10,000]。
+2. 输入的数组可能包含**重复**元素 ，所以**升序**的意思是**<=。**
+
+**Solution：**
+
+```java
+
+```
+
+
+
+### 617.合并二叉树
+
+**题目描述：**
+
+给定两个二叉树，想象当你将它们中的一个覆盖到另一个上时，两个二叉树的一些节点便会重叠。
+
+你需要将他们合并为一个新的二叉树。合并的规则是如果两个节点重叠，那么将他们的值相加作为节点合并后的新值，否则**不为** NULL 的节点将直接作为新二叉树的节点。
+
+**示例 1:**
+
+```
+输入: 
+	Tree 1                     Tree 2                  
+          1                         2                             
+         / \                       / \                            
+        3   2                     1   3                        
+       /                           \   \                      
+      5                             4   7                  
+输出: 
+合并后的树:
+	     3
+	    / \
+	   4   5
+	  / \   \ 
+	 5   4   7
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
+        if (t1 == null || t2 == null) {
+            return t1 != null ? t1 : t2;
+        }
+        
+        t1.val += t2.val;
+        t1.left = mergeTrees(t1.left, t2.left);
+        t1.right = mergeTrees(t1.right, t2.right);
+        return t1;
+    }
+}
+```
+
