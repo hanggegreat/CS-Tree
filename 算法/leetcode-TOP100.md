@@ -4559,4 +4559,244 @@ public class Solution {
 }
 ```
 
-### 
+### 347.前K个高频元素
+
+**题目描述：**
+
+给定一个非空的整数数组，返回其中出现频率前 **k** 高的元素。
+
+**示例 1:**
+
+```
+输入: nums = [1,1,1,2,2,3], k = 2
+输出: [1,2]
+```
+
+**示例 2:**
+
+```
+输入: nums = [1], k = 1
+输出: [1]
+```
+
+**说明：**
+
+- 你可以假设给定的 *k* 总是合理的，且 1 ≤ k ≤ 数组中不相同的元素的个数。
+- 你的算法的时间复杂度**必须**优于 O(*n* log *n*) , *n* 是数组的大小。
+
+**Solution：**
+
+```java
+public class Solution {
+    public List<Integer> topKFrequent(int[] nums, int k) {
+        List<Integer> res = new ArrayList<>();
+        if (nums == null || nums.length == 0 || k <= 0) {
+            return res;
+        }
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int num : nums) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
+        }
+        Queue<Integer> queue = new PriorityQueue<>(((o1, o2) -> map.get(o2) - map.get(o1)));
+        for (Integer key : map.keySet()) {
+            queue.offer(key);
+        }
+        for (int i = 0; i < k; i++) {
+            res.add(queue.poll());
+        }
+        return res;
+    }
+}
+```
+
+### 394.字符串解码
+
+**题目描述：**
+
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: `k[encoded_string]`，表示其中方括号内部的 *encoded_string* 正好重复 *k* 次。注意 *k* 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 *k* ，例如不会出现像 `3a` 或 `2[4]` 的输入。
+
+**示例:**
+
+```
+s = "3[a]2[bc]", 返回 "aaabcbc".
+s = "3[a2[c]]", 返回 "accaccacc".
+s = "2[abc]3[cd]ef", 返回 "abcabccdcdcdef".
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    private int i = 0;
+    
+    public String decodeString(String s) {
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        for (; i < s.length() && s.charAt(i) != ']'; i++) {
+            if ((s.charAt(i) >= 'a' && s.charAt(i) <= 'z') || (s.charAt(i) >= 'A' && s.charAt(i) <= 'Z')) {
+                sb.append(s.charAt(i));
+                continue;
+            }
+            int count = 0;
+            while (s.charAt(i) <= '9' && s.charAt(i) >= '0') {
+                count = count * 10 + s.charAt(i++) - '0';
+            }
+            i++; // 越过'['或
+            String temp = decodeString(s);
+            while (count-- > 0) {
+                sb.append(temp);
+            }
+        }
+        return sb.toString();
+    }
+}
+```
+
+### 406.根据身高重建队列
+
+**题目描述：**
+
+假设有打乱顺序的一群人站成一个队列。 每个人由一个整数对`(h, k)`表示，其中`h`是这个人的身高，`k`是排在这个人前面且身高大于或等于`h`的人数。 编写一个算法来重建这个队列。
+
+**注意：**
+总人数少于1100人。
+
+**示例**
+
+```
+输入:
+[[7,0], [4,4], [7,1], [5,0], [6,1], [5,2]]
+
+输出:
+[[5,0], [7,0], [5,2], [6,1], [4,4], [7,1]]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int[][] reconstructQueue(int[][] people) {
+        if (people == null || people.length == 0 || people[0].length == 0) {
+            return new int[0][0];
+        }
+        
+        Arrays.sort(people, (o1, o2) -> o1[0] == o2[0] ? o1[1] - o2[1] : o2[0] - o1[0]);
+        List<int[]> list = new ArrayList<>();
+        for (int[] i : people) {
+            list.add(i[1], i);
+        }
+        return list.toArray(new int[list.size()][]);
+    }
+}
+```
+
+### 416.分割等和子集
+
+**题目描述：**
+
+给定一个**只包含正整数**的**非空**数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+
+**注意:**
+
+1. 每个数组中的元素不会超过 100
+2. 数组的大小不会超过 200
+
+**示例 1:**
+
+```
+输入: [1, 5, 11, 5]
+
+输出: true
+
+解释: 数组可以分割成 [1, 5, 5] 和 [11].
+```
+
+ 
+
+**示例 2:**
+
+```
+输入: [1, 2, 3, 5]
+
+输出: false
+
+解释: 数组不能分割成两个元素和相等的子集.
+```
+
+**Solution:**
+
+```java
+public class Solution {
+    public boolean canPartition(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return true;
+        }
+        
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        if ((sum & 1) == 1) {
+            return false;
+        }
+        int c = (sum >> 1) + 1;
+        // dp[i] 表示nums能否装下容量为i的背包
+        boolean[] dp = new boolean[c];
+        dp[0] = true;
+        for (int i = 1; i < nums.length; i++) {
+            for (int j = c - 1; j >= nums[i]; j--) {
+                dp[j] = dp[j] || dp[j - nums[i]];
+            }
+        }
+        return dp[c - 1];
+    }
+}
+```
+
+### 437.路径总和Ⅲ
+
+**题目描述：**
+
+给定一个二叉树，它的每个结点都存放着一个整数值。
+
+找出路径和等于给定数值的路径总数。
+
+路径不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
+
+二叉树不超过1000个节点，且节点数值范围是 [-1000000,1000000] 的整数。
+
+**示例：**
+
+```html
+root = [10,5,-3,3,2,null,11,3,-2,null,1], sum = 8
+
+      10
+     /  \
+    5   -3
+   / \    \
+  3   2   11
+ / \   \
+3  -2   1
+
+返回 3。和等于 8 的路径有:
+
+1.  5 -> 3
+2.  5 -> 2 -> 1
+3.  -3 -> 11
+```
+
+**Solution：**
+
+```java
+
+```
+
