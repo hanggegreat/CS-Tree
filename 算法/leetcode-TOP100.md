@@ -4797,6 +4797,188 @@ root = [10,5,-3,3,2,null,11,3,-2,null,1], sum = 8
 **Solution：**
 
 ```java
+public class Solution {
+    public int pathSum(TreeNode root, int sum) {
+        if (root == null) {
+            return 0;
+        }
 
+        return pathSumCount(root, sum)
+                + pathSum(root.left, sum)
+                + pathSum(root.right, sum);
+    }
+
+    public int pathSumCount(TreeNode root, int sum) {
+        if (root == null) {
+            return 0;
+        }
+
+        return (root.val == sum ? 1 : 0)
+                + pathSumCount(root.left, sum - root.val)
+                + pathSumCount(root.right, sum - root.val);
+    }
+}
+```
+
+### 438.找到字符串中所有字母异位词
+
+**题目描述：**
+
+给定一个字符串 **s** 和一个非空字符串 **p**，找到 **s** 中所有是 **p** 的字母异位词的子串，返回这些子串的起始索引。
+
+字符串只包含小写英文字母，并且字符串 **s** 和 **p** 的长度都不超过 20100。
+
+**说明：**
+
+- 字母异位词指字母相同，但排列不同的字符串。
+- 不考虑答案输出的顺序。
+
+**示例 1:**
+
+```
+输入:
+s: "cbaebabacd" p: "abc"
+
+输出:
+[0, 6]
+
+解释:
+起始索引等于 0 的子串是 "cba", 它是 "abc" 的字母异位词。
+起始索引等于 6 的子串是 "bac", 它是 "abc" 的字母异位词。
+```
+
+ **示例 2:**
+
+```
+输入:
+s: "abab" p: "ab"
+
+输出:
+[0, 1, 2]
+
+解释:
+起始索引等于 0 的子串是 "ab", 它是 "ab" 的字母异位词。
+起始索引等于 1 的子串是 "ba", 它是 "ab" 的字母异位词。
+起始索引等于 2 的子串是 "ab", 它是 "ab" 的字母异位词。
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public List<Integer> findAnagrams(String s, String p) {
+        List<Integer> res = new ArrayList<>();
+        if (s == null || p == null || s.length() < p.length()) {
+            return res;
+        }
+        int[] map = new int[26];
+        for (int i = 0; i < p.length(); i++) {
+            map[p.charAt(i) - 'a']++;
+        }
+        int count = p.length();
+        int l = 0;
+        int r = 0;
+        while (r < s.length()) {
+            if (map[s.charAt(r++) - 'a']-- > 0) {
+                count--;
+            }
+            if (count == 0) {
+                res.add(l);
+            }
+            if (r - l == p.length()) {
+                if (map[s.charAt(l++) - 'a']++ >= 0) {
+                    count++;
+                }
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 448.找到所有数组中消失的数字
+
+**题目描述：**
+
+给定一个范围在  1 ≤ a[i] ≤ *n* ( *n* = 数组大小 ) 的 整型数组，数组中的元素一些出现了两次，另一些只出现一次。
+
+找到所有在 [1, *n*] 范围之间没有出现在数组中的数字。
+
+您能在不使用额外空间且时间复杂度为*O(n)*的情况下完成这个任务吗? 你可以假定返回的数组不算在额外空间内。
+
+**示例:**
+
+```
+输入:
+[4,3,2,7,8,2,3,1]
+
+输出:
+[5,6]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        List<Integer> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return res;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[Math.abs(nums[i]) - 1] > 0) {
+                nums[Math.abs(nums[i]) - 1] *= -1;
+            }
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) {
+                res.add(i + 1);
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 461.汉明距离
+
+**题目描述：**
+
+两个整数之间的[汉明距离](https://baike.baidu.com/item/%E6%B1%89%E6%98%8E%E8%B7%9D%E7%A6%BB)指的是这两个数字对应二进制位不同的位置的数目。
+
+给出两个整数 `x` 和 `y`，计算它们之间的汉明距离。
+
+**注意：**
+0 ≤ `x`, `y` < 231.
+
+**示例:**
+
+```
+输入: x = 1, y = 4
+
+输出: 2
+
+解释:
+1   (0 0 0 1)
+4   (0 1 0 0)
+       ↑   ↑
+
+上面的箭头指出了对应二进制位不同的位置。
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int hammingDistance(int x, int y) {
+        int res = 0;
+        int temp =  x ^ y;
+        while (temp != 0) {
+            res += temp & 1;
+            temp >>>= 1;
+        }
+        return res;
+    }
+}
 ```
 
