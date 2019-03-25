@@ -4301,6 +4301,262 @@ public class Codec {
 **Solution：**
 
 ```java
-
+public class Solution {
+    public int lengthOfLIS(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        
+        // dp[i]表示以nums中第i个元素结尾的最长上升子序列长度
+        int[] dp = new int[nums.length];
+        int res = 1;
+        Arrays.fill(dp, 1);
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = 0; j <= i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = Math.max(dp[j] + 1, dp[i]);
+                    res = Math.max(res, dp[i]);
+                }
+            }
+        }
+        return res;
+    }
+}
 ```
 
+###	 309.最佳买卖股票时期含冷冻期
+
+**题目描述：**
+
+给定一个整数数组，其中第 *i* 个元素代表了第 *i* 天的股票价格 。
+
+设计一个算法计算出最大利润。在满足以下约束条件下，你可以尽可能地完成更多的交易（多次买卖一支股票）:
+
+- 你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+- 卖出股票后，你无法在第二天买入股票 (即冷冻期为 1 天)。
+
+**示例:**
+
+```
+输入: [1,2,3,0,2]
+输出: 3 
+解释: 对应的交易状态为: [买入, 卖出, 冷冻期, 买入, 卖出]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int maxProfit(int[] prices) {
+        if (prices == null || prices.length < 2) {
+            return 0;
+        }
+        int buy = Integer.MIN_VALUE;
+        int sale = 0;
+        int rest = 0;
+        for (int price : prices) {
+            int salePre = sale;
+            int buyPre = buy;
+            sale = Math.max(buy + price, sale);// 卖或者冻结
+            buy = Math.max(buy, rest - price); // 什么都不干或者卖
+            rest = Math.max(rest, Math.max(salePre, buy));
+        }
+        return sale;
+    }
+}
+```
+
+### 312.戳气球
+
+有 `n` 个气球，编号为`0` 到 `n-1`，每个气球上都标有一个数字，这些数字存在数组 `nums` 中。
+
+现在要求你戳破所有的气球。每当你戳破一个气球 `i` 时，你可以获得 `nums[left] * nums[i] * nums[right]` 个硬币。 这里的 `left` 和 `right` 代表和 `i` 相邻的两个气球的序号。注意当你戳破了气球 `i` 后，气球 `left` 和气球 `right` 就变成了相邻的气球。
+
+求所能获得硬币的最大数量。
+
+**说明:**
+
+- 你可以假设 `nums[-1] = nums[n] = 1`，但注意它们不是真实存在的所以并不能被戳破。
+- 0 ≤ `n` ≤ 500, 0 ≤ `nums[i]` ≤ 100
+
+**示例:**
+
+```html
+输入: [3,1,5,8]
+输出: 167 
+解释: nums = [3,1,5,8] --> [3,5,8] -->   [3,8]   -->  [8]  --> []
+     coins =  3*1*5      +  3*5*8    +  1*3*8      + 1*8*1   = 167
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int maxCoins(int[] iNums) {
+        int n = iNums.length;
+        int[] nums = new int[n + 2];
+        for (int i = 0; i < n; i++) {
+            nums[i + 1] = iNums[i];
+        }
+        nums[0] = nums[n + 1] = 1;
+        // dp[i][j]表示戳爆[i, j]区间气球得到的最大硬币个数
+        int[][] dp = new int[n + 2][n + 2];
+        for (int k = 1; k <= n; k++) { // k表示长度
+            for (int i = 1; i <= n - k + 1; i++) {// i表示起始位置
+                int j = i + k - 1; // j表示结束位置
+                for (int x = i; x <= j; x++) {
+                    // 戳爆 [i, x - 1] 、 x 、 [x + 1, j] 
+                    dp[i][j] = Math.max(dp[i][j], dp[i][x - 1] + nums[i - 1] * nums[x] * nums[j + 1] + dp[x + 1][j]);
+                }
+            }
+        }
+        return dp[1][n];
+    }
+}
+```
+
+### 322.零钱兑换
+
+**题目描述：**
+
+给定不同面额的硬币 coins 和一个总金额 amount。编写一个函数来计算可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额，返回 `-1`。
+
+**示例 1:**
+
+```
+输入: coins = [1, 2, 5], amount = 11
+输出: 3 
+解释: 11 = 5 + 5 + 1
+```
+
+**示例 2:**
+
+```
+输入: coins = [2], amount = 3
+输出: -1
+```
+
+**说明**:
+你可以认为每种硬币的数量是无限的。
+
+**Solution：**
+
+```java
+public class Solution {
+    public int coinChange(int[] coins, int amount) {
+        if (coins == null || coins.length == 0 || amount < 0) {
+            return -1;
+        }
+        
+        int res = 0;
+        int[] dp = new int[amount + 1];
+        for (int i = 1; i <= amount; i++) {
+            dp[i] = amount + 1;
+            for (int j = 0; j < coins.length; j++) {
+                if (i >= coins[j]) {
+                    dp[i] = Math.min(dp[i], dp[i - coins[j]] + 1);
+                }
+            }
+        }
+        return dp[amount] > amount ? -1 : dp[amount];
+    }
+}
+```
+
+### 337.打家劫舍Ⅲ
+
+**题目描述：**
+
+在上次打劫完一条街道之后和一圈房屋后，小偷又发现了一个新的可行窃的地区。这个地区只有一个入口，我们称之为“根”。 除了“根”之外，每栋房子有且只有一个“父“房子与之相连。一番侦察之后，聪明的小偷意识到“这个地方的所有房屋的排列类似于一棵二叉树”。 如果两个直接相连的房子在同一天晚上被打劫，房屋将自动报警。
+
+计算在不触动警报的情况下，小偷一晚能够盗取的最高金额。
+
+**示例 1:**
+
+```
+输入: [3,2,3,null,3,null,1]
+
+     3
+    / \
+   2   3
+    \   \ 
+     3   1
+
+输出: 7 
+解释: 小偷一晚能够盗取的最高金额 = 3 + 3 + 1 = 7.
+```
+
+**示例 2:**
+
+```
+输入: [3,4,5,1,3,null,1]
+
+     3
+    / \
+   4   5
+  / \   \ 
+ 1   3   1
+
+输出: 9
+解释: 小偷一晚能够盗取的最高金额 = 4 + 5 = 9.
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int rob(TreeNode root) {
+        int[] res = helper(root);
+        return Math.max(res[0], res[1]);
+    }
+    
+    private int[] helper(TreeNode root) {
+        int[] res = new int[2];
+        if (root == null) {
+            return res;
+        }
+        int[] left = helper(root.left);
+        int[] right = helper(root.right);
+        res[0] = Math.max(left[0], left[1]) + Math.max(right[0], right[1]); // 不打劫当前节点
+        res[1] = root.val + left[0] + right[0]; // 打劫当前节点和左右子树的子树
+        return res;
+    }
+}
+```
+
+### 338.比特位计数
+
+**题目描述：**
+
+给定一个非负整数 **num**。对于 **0 ≤ i ≤ num** 范围中的每个数字 **i** ，计算其二进制数中的 1 的数目并将它们作为数组返回。
+
+**示例 1:**
+
+```
+输入: 2
+输出: [0,1,1]
+```
+
+**示例 2:**
+
+```
+输入: 5
+输出: [0,1,1,2,1,2]
+```
+
+**Solution：**
+
+```java
+public class Solution {
+    public int[] countBits(int num) {
+        int[] res = new int[num + 1];
+        for (int i = 1; i <= num; i++) {
+            // 将i表示的二进制数的最后一位1变成0即为 i & (i - 1)
+            res[i] = res[i & (i - 1)] + 1;
+        }
+        return res;
+    }
+}
+```
+
+### 
