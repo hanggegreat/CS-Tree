@@ -5278,7 +5278,32 @@ public class Solution {
 **Solution：**
 
 ```java
-
+public class Solution {
+    public int findUnsortedSubarray(int[] nums) {
+        if (nums == null || nums.length < 2) {
+            return 0;
+        }
+        
+        int min = nums[nums.length - 1];
+        int max = nums[0];
+        int start = 0;
+        int end = -1;
+        for (int i = 1; i < nums.length; i++) {
+            if (max > nums[i]) {
+                end = i;
+            } else {
+                max = nums[i];
+            }
+            
+            if (min < nums[nums.length - i - 1]) {
+                start = nums.length - i - 1;
+            } else {
+                min = nums[nums.length - i - 1];
+            }
+        }
+        return end - start + 1;
+    }
+}
 ```
 
 
