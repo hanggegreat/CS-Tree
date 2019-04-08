@@ -216,6 +216,7 @@ public class Solution {
                 node.left = reBuildTree(pre, in, ps + 1, ps + i - is, is, i - 1);
                 node.right = reBuildTree(pre, in, ps + i - is + 1, pe, i + 1, ie);
             }
+            break;
         }
         return node;
     }
@@ -231,12 +232,6 @@ public class Solution {
 **Solution**
 
 ```java
-/**
-*  本题解答采用的思路如下：
-*  数据插入时，直接push到stack1中
-*  当弹出数据时，先将stack1中的元素依次弹出并插入stack2中，此时stack2栈顶即为要弹出的数据
-*  在弹出完毕后，再将stack2中的元素一次弹出并插入stack1中即可
-*/
 import java.util.Stack;
 
 public class Solution {
@@ -248,18 +243,13 @@ public class Solution {
     }
     
     public int pop() {
-        if (stack1.size() == 0) {
-            throw new RuntimeException();
+        if (stack2.isEmpty()) {
+            while (!stack1.isEmpty()) {
+                stack2.push(stack1.pop());
+            }
         }
         
-        while (stack1.size() > 1) {
-            stack2.push(stack1.pop());
-        }
-        int res = stack1.pop();
-        while (!stack2.isEmpty()) {
-            stack1.push(stack2.pop());
-        }
-        return res;
+        return stack2.pop();
     }
 }
 ```
