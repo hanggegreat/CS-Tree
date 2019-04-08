@@ -272,19 +272,21 @@ public class Solution {
             return 0;
         }
         
-        int left = 0;
-        int right = array.length - 1;
-        while (left <= right) {
-            int mid = (left + right) >> 1;
-            if (array[mid] > array[right]) {
-                left = mid + 1;
-            } else if (array[mid] == array[right]) {
-                right--;
+        int l = 0;
+        int r = array.length - 1;
+        
+        while (l <= r) {
+            int mid = l + (r - l) / 2;
+            if (array[mid] > array[r]) {
+                l = mid + 1;
+            } else if (array[mid] == array[r]) {
+                r--;
             } else {
-                right = mid;
+                r = mid;
             }
         }
-        return array[left];
+        
+        return array[l];
     }
 }
 ```
@@ -307,18 +309,16 @@ n<=39
 */
 public class Solution {
     public int Fibonacci(int n) {
-        if (n < 2) {
-            return n;
+        int res = 0;
+        int pre = 1;
+        
+        for (int i = 0; i < n; i++) {
+            int temp = res;
+            res += pre;
+            pre = temp;
         }
         
-        int a = 1;
-        int b = 1;
-        for (int i = 2; i < n; i++) {
-            int temp = a;
-            a = b;
-            b += temp;
-        }
-        return b;
+        return res;
     }
 }
 ```
@@ -337,18 +337,16 @@ public class Solution {
 */
 public class Solution {
     public int JumpFloor(int target) {
-        if (target < 2) {
-            return 1;
+        int pre = 0;
+        int res = 1;
+        
+        for (int i = 0; i < target; i++) {
+            int temp = res;
+            res += pre;
+            pre = temp;
         }
         
-        int a = 1;
-        int b = 1;
-        for (int i = 2; i <= target; i++) {
-            int temp = b;
-            b = a + b;
-            a = temp;
-        }
-        return b;
+        return res;
     }
 }
 ```
@@ -370,7 +368,7 @@ public class Solution {
         if (target < 2) {
             return 1;
         }
-        return (int) Math.pow(2, target - 1);
+        return 1 << (target - 1);
     }
 }
 ```
@@ -389,17 +387,20 @@ public class Solution {
 */
 public class Solution {
     public int RectCover(int target) {
-        if (target < 2) {
+        if (target < 4) {
             return target;
         }
-        int a = 1;
-        int b = 1;
-        for (int i = 2; i <= target; i++) {
-            int temp = b;
-            b += a;
-            a = temp;
+        
+        int pre = 2;
+        int res = 3;
+        
+        for (int i = 3; i < target; i++) {
+            int temp = res;
+            res += pre;
+            pre = temp;
         }
-        return b;
+        
+        return res;
     }
 }
 ```
@@ -475,19 +476,18 @@ public class Solution {
 */
 public class Solution {
     public void reOrderArray(int [] array) {
-        if (array == null || array.length < 2) {
+        if (array == null || array.length == 0) {
             return;
         }
-
-        int m = -1; // 记录排好序的最后一个奇数位置
+        
+        int lastOdd = -1; // 记录排好序的最后一个奇数位置
         for (int i = 0; i < array.length; i++) {
-            if ((array[i] & 1) == 1) { // 奇数
+            if ((array[i] & 1) == 1) {
                 int temp = array[i];
-                for (int j = i; j > m + 1; j--) {
-                    array[j] = array[j - 1];
+                for (int j = i; i > lastOdd + 1; i--) {
+                    array[i] = array[i - 1];
                 }
-                array[m + 1] = temp;
-                m++;
+                array[++lastOdd] = temp;
             }
         }
     }
