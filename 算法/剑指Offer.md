@@ -1204,10 +1204,6 @@ public class Solution {
 **Solution**
 
 ```java
-/**
-* 使用优先队列，即小顶堆，将全部元素保存到优先队列中，弹出的前K个元素即为最小的K个元素
-*/
-
 import java.util.*;
 
 public class Solution {
@@ -1218,14 +1214,49 @@ public class Solution {
             return res;
         }
 
-        PriorityQueue<Integer> queue = new PriorityQueue();
-        for (int num : input) {
-            queue.offer(num);
+        int l = 0, r = input.length - 1;
+        while (l < r) {
+            int pos = partition(input, l, r);
+            if (pos == k) {
+                break;
+            }
+            if (pos < k) {
+                l = pos + 1;
+            } else  {
+                r = pos - 1;
+            }
         }
+        
         for (int i = 0; i < k; i++) {
-            res.add(queue.poll());
+            res.add(input[i]);
         }
         return res;
+    }
+    
+    private int partition(int[] array, int start, int end) {
+        int temp = array[start];
+        int i = start, j = end;
+        while (i < j) {
+            while (i < j && array[j] > temp) {
+                j--;
+            }
+            while (i < j && array[i] <= temp) {
+                i++;
+            }
+            
+            if (i < j) {
+                swap(array, i, j);
+            }
+        }
+        
+        swap(array, start, i);
+        return i;
+    }
+    
+    private void swap(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
     }
 }
 ```
