@@ -1666,17 +1666,28 @@ import java.util.*;
 //将num1[0],num2[0]设置为返回结果
 public class Solution {
     public void FindNumsAppearOnce(int[] array, int num1[], int num2[]) {
-        Set<Integer> set = new HashSet<>();
+        if (array == null || array.length < 2) {
+            return;
+        }
+        int sum = 0;
         for (int num : array) {
-            if (set.contains(num)) {
-                set.remove(num);
-            } else {
-                set.add(num);
+            sum ^= num;
+        }
+        
+        int index = 0;
+        for (; index < 32; index++) {
+            if ((sum & (1 << index)) != 0) {
+                break;
             }
         }
-        Object[] elements = set.toArray();
-        num1[0] = (Integer) elements[0];
-        num2[0] = (Integer) elements[1];
+        
+        for (int num : array) {
+            if ((num & (1 << index)) == 0) {
+                num1[0] ^= num;
+            } else {
+                num2[0] ^= num;
+            }
+        }
     }
 }
 ```
