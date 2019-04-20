@@ -1368,7 +1368,7 @@ public class Solution {
             return index;
         }
 
-        int[] array = new int[index + 1];
+        int[] array = new int[index];
         array[0] = 1;
         //i2，i3，i5分别为三个队列的指针
         int i2 = 0;
@@ -1528,22 +1528,14 @@ import java.util.*;
 
 public class Solution {
     public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
-        Set<ListNode> set = new HashSet<>();
+        ListNode p1 = pHead1;
+        ListNode p2 = pHead2;
         
-        ListNode node1 = pHead1;
-        ListNode node2 = pHead2;
-        while (node1 != null) {
-            set.add(node1);
-            node1 = node1.next;
+        while (p1 != p2) {
+            p1 = p1 == null ? pHead2 : p1.next;
+            p2 = p2 == null ? pHead1 : p2.next;
         }
-        while (node2 != null) {
-            if (set.contains(node2)) {
-                return node2;
-            }
-            
-            node2 = node2.next;
-        }
-        return null;
+        return p1;
     }
 }
 ```
