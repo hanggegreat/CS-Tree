@@ -1754,25 +1754,23 @@ import java.util.ArrayList;
 public class Solution {
     public ArrayList<Integer> FindNumbersWithSum(int[] array, int sum) {
         ArrayList<Integer> res = new ArrayList<>();
-        int left = 0;
-        int right = array.length - 1;
-
-        while (left < right) {
-            if (array[left] + array[right] < sum) {
-                left++;
-            } else if (array[left] + array[right] > sum) {
-                right--;
+        int l = 0, r = array.length - 1;
+        while (l <= r) {
+            if (array[l] + array[r] < sum) {
+                l++;
+            } else if (array[l] + array[r] > sum) {
+                r--;
             } else {
-                if (res.isEmpty()
-                        || res.get(0) * res.get(1) > array[left] * array[right]) {
+                if (res.size() == 0 || array[l] * array[r] < res.get(0) * res.get(1)) {
                     res.clear();
-                    res.add(array[left]);
-                    res.add(array[right]);
+                    res.add(array[l]);
+                    res.add(array[r]);
                 }
-                left++;
-                right--;
+                l++;
+                r--;
             }
         }
+        
         return res;
     }
 }
