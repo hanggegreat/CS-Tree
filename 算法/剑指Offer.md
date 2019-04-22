@@ -1708,33 +1708,27 @@ public class Solution {
 
 ```java
 import java.util.ArrayList;
-    
+
 public class Solution {
     public ArrayList<ArrayList<Integer>> FindContinuousSequence(int sum) {
         ArrayList<ArrayList<Integer>> res = new ArrayList<>();
-        int left = 1;
-        int right = 2;
-        int curSum = 3;
+        int l = 1, r = 2, curr = 3;
         
-        while (right < sum) {
-            if (curSum < sum) {
-                right++;
-                curSum += right;
-            } else if (curSum > sum) {
-                curSum -= left;
-                left++;
+        while (l < r && r < sum) {
+            if (curr < sum) {
+                curr += ++r;
+            } else if (curr > sum) {
+                curr -= l++;
             } else {
                 ArrayList<Integer> list = new ArrayList<>();
-                for (int i = left; i <= right; i++) {
+                for (int i = l; i <= r; i++) {
                     list.add(i);
                 }
                 res.add(list);
-                curSum -= left;
-                left++;
-                right++;
-                curSum += right;
+                curr -= l++;
             }
         }
+        
         return res;
     }
 }
