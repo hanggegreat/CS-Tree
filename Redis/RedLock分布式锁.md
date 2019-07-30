@@ -52,7 +52,7 @@ Redis 官方提出了一种权威的基于 Redis 实现分布式锁的方式名�
 
 [RedLock官方文档翻译](http://ifeve.com/redis-lock/)
 
-[JavaGuide]([https://github.com/Snailclimb/JavaGuide/blob/master/docs/database/Redis/Redlock%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81.md](https://github.com/Snailclimb/JavaGuide/blob/master/docs/database/Redis/Redlock分布式锁.md))
+[JavaGuide](https://github.com/Snailclimb/JavaGuide/blob/master/docs/database/Redis/Redlock分布式锁.md)
 
 [互联网 Java 工程师进阶知识完全扫盲](https://github.com/doocs/advanced-java)
 
