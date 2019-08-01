@@ -21,6 +21,8 @@ SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给�
 
 客户端发送请求 -> 前端控制器 DispatcherServlet 接受客户端请求 -> 找到处理器映射 HandlerMapping 解析请求对应的 Handler-> HandlerAdapter 会根据 Handler 来调用真正的处理器开处理请求，并处理相应的业务逻辑 -> 处理器返回一个模型视图 ModelAndView -> 视图解析器进行解析 -> 返回一个视图对象->前端控制器 DispatcherServlet 渲染数据（Moder）->将得到视图对象返回给用户
 
+![image-20190801183407085](assets/image-20190801183407085.png)
+
 1. 客户端（浏览器）发送请求，直接请求到 `DispatcherServlet`。
 2. `DispatcherServlet` 根据请求信息调用 `HandlerMapping`，解析请求对应的 `Handler`。
 3. 解析到对应的 `Handler`（ `Controller`）后，开始由 `HandlerAdapter` 适配器处理。
@@ -29,4 +31,10 @@ SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给�
 6. `ViewResolver` 会根据逻辑 `View` 查找实际的 `View`。
 7. `DispaterServlet` 把返回的 `Model` 传给 `View`（视图渲染）。
 8. 把 `View` 返回给请求者（浏览器）
+
+
+
+### 参考资料
+
+[JavaGuide](https://github.com/Snailclimb/JavaGuide/blob/master/docs/system-design/framework/spring/SpringMVC-Principle.md)
 
