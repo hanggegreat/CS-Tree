@@ -30,6 +30,36 @@ AOP（面向切面编程）能够将那些与业务无关，**却为业务模块
 
 使用 AOP 之后我们可以把一些通用功能抽象出来，在需要用到的地方直接使用即可，这样大大简化了代码量。我们需要增加新功能时也方便，这样也提高了系统扩展性。日志功能、事务管理等等场景都用到了 AOP 。
 
+### Spring Bean的作用域
+
+默认是单例。
+
+|  作用域   | 说明                       |
+| :-------: | -------------------------- |
+| Signleton | 整个应用中只创建一个实例   |
+| prototype | 每次注入时都会新建一个实例 |
+|  session  | 为每个会话创建一个实例     |
+|  request  | 为每个请求创建一个实例     |
+
+### Spring Bean 生命周期
+1. 实例化一个 Bean。
+2. 按照 Spring 上下文对实例化的 Bean 进行配置（IOC 注入）。
+3. 如果这个 Bean 已经实现了 BeanNameAware 接口，会调用它实现的 setBeanNa
+   me(String name)方法，此处传递的就是 Spring 配置文件中 Bean 的 id 值。
+4. 如果这个 Bean 已经实现了 BeanFactoryAware 接口，会调用它实现的 setBeanF
+   actory(setBeanFactory(BeanFactory)传递的是 Spring 工厂自身。
+5. 如果这个 Bean 已经实现了 ApplicationContextAware 接口，会调用 setApplica
+   tionContext(ApplicationContext)方法，传入 Spring 上下文。
+6. 如果这个 Bean 关联了 BeanPostProcessor 接口，将会调用 postProcessBefore
+   Initialization(Object obj, String s)方法，BeanPostProcessor 经常被用作是 Bean
+   内容的更改，并且由于这个是在 Bean 初始化结束时调用那个的方法，也可以被应用于内存
+   或缓存技术。
+7. 如果 Bean 在 Spring 配置文件中配置了 init-method 属性会自动调用其配置的初始化方法。
+8. 如果这个 Bean 关联了 BeanPostProcessor 接口，将会调用 postProcessAfterInitialization(Object obj, String s)方法。
+9. 当 Bean 不再需要时，会经过清理阶段，如果 Bean 实现了 DisposableBean 这个
+   接口，会调用那个其实现的 destroy()方法。
+10. 最后，如果这个 Bean 的 Spring 配置中配置了 destroy-method 属性，会自动调用其配置的销毁方法。 
+
 ### Spring 框架中用到了哪些设计模式？
 
 - **工厂设计模式** : Spring使用工厂模式通过 `BeanFactory`、`ApplicationContext` 创建 bean 对象。
