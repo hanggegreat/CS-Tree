@@ -86,5 +86,11 @@ AOP（面向切面编程）能够将那些与业务无关，**却为业务模块
 
 `@EnableAutoConfiguration`，`@Configuration`，`@ConditionalOnClass` 就是自动配置的核心，首先它得是一个配置文件，其次根据类路径下是否有这个类去自动配置。
 
-《[Spring Boot自动配置原理、实战](https://mp.weixin.qq.com/s/gs2zLSH6m9ijO0-pP2sr9Q)》
+
+
+### 参考资料
+
+[JavaGuide](https://github.com/Snailclimb/JavaGuide/blob/master/docs/system-design/framework/spring/SpringMVC-Principle.md)
+
+[Spring Boot自动配置原理实战](https://mp.weixin.qq.com/s/gs2zLSH6m9ijO0-pP2sr9Q)
 
