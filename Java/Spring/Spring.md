@@ -44,14 +44,10 @@ AOP（面向切面编程）能够将那些与业务无关，**却为业务模块
 ### Spring Bean 生命周期
 1. 实例化一个 Bean。
 2. 按照 Spring 上下文对实例化的 Bean 进行配置（IOC 注入）。
-3. 如果 Bean 实现了 BeanNameAware 接口，会调用它实现的 setBeanNa
-   me(String name)方法，此处传递的就是 Spring 配置文件中 Bean 的 id 值。
-4. 如果 Bean 实现了 BeanFactoryAware 接口，会调用它实现的 setBeanF
-   actory(setBeanFactory(BeanFactory)传递的是 Spring 工厂自身，可以用来获取其他Bean。
-5. 如果 Bean 实现了 ApplicationContextAware 接口，会调用 setApplica
-   tionContext(ApplicationContext)方法，传入 Spring 上下文（因为ApplicationContext为BeanFactory子接口，所以功能更丰富）。
-6. 如果 Bean 关联了 BeanPostProcessor 接口，将会调用 postProcessBefore
-   Initialization(Object obj, String s)方法，BeanPostProcessor 经常被用作是 Bean
+3. 如果 Bean 实现了 BeanNameAware 接口，会调用它实现的 setBeanName(String name)方法，此处传递的就是 Spring 配置文件中 Bean 的 id 值。
+4. 如果 Bean 实现了 BeanFactoryAware 接口，会调用它实现的 setBeanFactory(setBeanFactory(BeanFactory)传递的是 Spring 工厂自身，可以用来获取其他Bean。
+5. 如果 Bean 实现了 ApplicationContextAware 接口，会调用 setApplicationContext(ApplicationContext)方法，传入 Spring 上下文（因为ApplicationContext为BeanFactory子接口，所以功能更丰富）。
+6. 如果 Bean 关联了 BeanPostProcessor 接口，将会调用 postProcessBeforeInitialization(Object obj, String s)方法，BeanPostProcessor 经常被用作是 Bean
    内容的更改，并且由于这个是在 Bean 初始化结束时调用那个的方法，也可以被应用于内存
    或缓存技术。
 7. 如果 Bean 在 Spring 配置文件中配置了 init-method 属性会自动调用其配置的初始化方法。
