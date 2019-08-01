@@ -166,20 +166,20 @@ public @interface EnableAutoConfiguration
 
 可以从图中看出  `AutoConfigurationImportSelector` 继承了 继承了 `ImportSelector`的 `DeferredImportSelector` 。
 
-ImportSelector有一个方法：**selectImports()**
+ImportSelector有一个方法：`selectImports()`
 
 ``` java
-	@Override
-	public String[] selectImports(AnnotationMetadata annotationMetadata) {
-		if (!isEnabled(annotationMetadata)) {
-			return NO_IMPORTS;
-		}
-		AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
-				.loadMetadata(this.beanClassLoader);
-		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(autoConfigurationMetadata,
-				annotationMetadata);
-		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
-	}
+@Override
+public String[] selectImports(AnnotationMetadata annotationMetadata) {
+  if (!isEnabled(annotationMetadata)) {
+    return NO_IMPORTS;
+  }
+  AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
+    .loadMetadata(this.beanClassLoader);
+  AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(autoConfigurationMetadata,
+                                                                            annotationMetadata);
+  return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
+}
 ```
 
 在`getAutoConfigurationEntry(autoConfigurationMetadata, annotationMetadata)`中实际调用了`SpringFactoriesLoader.loadSpringFactories()`方法，它其实是去加载  **"META-INF/spring.factories"**这个外部文件。这个外部文件里面有很多自动配置的类：
