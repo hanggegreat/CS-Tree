@@ -193,15 +193,13 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 以`HttpEncodingAutoConfiguration`为例解释SpringBoot的自动配置之原理：
 
 ```java
-// 启用ConfigurationProperties功能：
-// 这个ConfigurationProperties里面引入了一个类，这个类就是启用指定类的ConfigurationProperties功能
-// 有了这个@EnableConfigurationPropertie注解以后相当于把配置文件中对应值就和这个HttpEncodingProperties.class类绑定起来了。
+// 启用指定类的ConfigurationProperties功能
 @EnableConfigurationProperties(HttpEncodingProperties.class) 
 // 判断当前是不是web应用，@Conditional是spring底层，意思就是根据不同的条件，来进行自己不同的条件判断，如果满足指定的条件，那么整个配置类里边的配置才会生效。
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-// 看这个类里边有没有这个过滤器，就是判断当前项目里边有没有CharacterEncodingFilter这个类，这个CharacterEncodingFilter类是Springmvc中乱码解决的过滤器。
+// 看这个类里边有没有这个过滤器，就是判断当前项目里边有没有CharacterEncodingFilter这个类，如果满足指定的条件，那么整个配置类里边的配置才会生效。
 @ConditionalOnClass(CharacterEncodingFilter.class)
-// 判断配置文件中是否存在某个配置，就是是否存在spring.http.encoding.enabled这个配置，matchIfMissing的意思就是如果不存在也认为这个判断是正确的，即使配置文件中不配置spring.http.encoding.enabled=true这个属性，也是默认生效的
+// 判断配置文件中是否存在spring.http.encoding.enabled这个配置，matchIfMissing的意思就是如果不存在也认为这个判断是正确的，也是默认生效的
 @ConditionalOnProperty(prefix = "spring.http.encoding", value = "enabled", matchIfMissing = true)
 public class HttpEncodingAutoConfiguration 
 ```
