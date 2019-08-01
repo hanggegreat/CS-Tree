@@ -53,7 +53,7 @@ AOP（面向切面编程）能够将那些与业务无关，**却为业务模块
 7. 如果 Bean 在 Spring 配置文件中配置了 init-method 属性会自动调用其配置的初始化方法。
 8. 如果 Bean 关联了 BeanPostProcessor 接口，将会调用 postProcessAfterInitialization(Object obj, String s)方法。
 9. 当 Bean 不再需要时，会经过清理阶段，如果 Bean 实现了 DisposableBean 这个接口，会调用那个其实现的 destroy()方法。
-10. 最后，如果 Bean 的 Spring 配置中配置了 destroy-method 属性，会自动调用其配置的销毁方法。 
+10. 如果 Bean 的 Spring 配置中配置了 destroy-method 属性，会自动调用其配置的销毁方法。 
 
 ### Spring 框架中用到了哪些设计模式？
 
@@ -109,7 +109,102 @@ AOP（面向切面编程）能够将那些与业务无关，**却为业务模块
 
 ### SpringBoot 自动配置原理
 
-`@EnableAutoConfiguration`，`@Configuration`，`@ConditionalOnClass` 就是自动配置的核心，首先它得是一个配置文件，其次根据类路径下是否有这个类去自动配置。
+#### SpringBoot应用从主方法里面进行启动
+
+```java
+@SpringBootApplication
+public class SpringBootApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBoot02ConfigAutoconfigApplication.class, args);
+    }
+}
+```
+
+#### `@SpringBootApplication`注解
+
+``` java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+public @interface SpringBootApplication
+```
+
+**三个比较重要的注解：**
+
+- `@SpringBootConfiguration`：SpringBoot的配置类，标注在某个类上，表示这是一个SpringBoot的配置类
+- `@EnableAutoConfiguration`：开启自动配置类，SpringBoot的精华所在。
+- `@ComponentScan`包扫描
+
+　　现在Spring Boot帮我们自动配置了以前需要自己配置的东西；`@EnableAutoConfiguration`告诉SpringBoot开启自动配置功能，这样自动配置才能生效；
+
+#### `@EnableAutoConfiguration`注解
+
+``` java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@AutoConfigurationPackage
+@Import(AutoConfigurationImportSelector.class)
+public @interface EnableAutoConfiguration
+```
+
+**两个比较重要的注解：**
+
+- `@AutoConfigurationPackage`：自动配置包
+- `@Import`：导入自动配置的组件
+
+#### `@Import(AutoConfigurationImportSelector.class)`注解
+
+![image-20190801192923059](assets/image-20190801192923059.png)
+
+可以从图中看出  `AutoConfigurationImportSelector` 继承了 继承了 `ImportSelector`的 `DeferredImportSelector` 。
+
+ImportSelector有一个方法：**selectImports()**
+
+``` java
+@Override
+	public String[] selectImports(AnnotationMetadata annotationMetadata) {
+		if (!isEnabled(annotationMetadata)) {
+			return NO_IMPORTS;
+		}
+		AutoConfigurationMetadata autoConfigurationMetadata = AutoConfigurationMetadataLoader
+				.loadMetadata(this.beanClassLoader);
+		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(autoConfigurationMetadata,
+				annotationMetadata);
+		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
+	}
+```
+
+在`getAutoConfigurationEntry(autoConfigurationMetadata, annotationMetadata)`中实际调用了`SpringFactoriesLoader.loadSpringFactories()`方法，它其实是去加载  **"META-INF/spring.factories"**这个外部文件。这个外部文件里面有很多自动配置的类：
+
+![image-20190801194432543](assets/image-20190801194432543.png)
+
+然后找到配置所有`EnableAutoConfiguration`的值加入到Spring容器中。
+
+加入到容器中之后的作用就是用它们来做自动配置，这就是Springboot自动配置之源，也就是自动配置的开始，只有这些自动配置类进入到容器中以后，接下来这个自动配置类才开始进行启动。
+
+以`HttpEncodingAutoConfiguration`为例解释SpringBoot的自动配置之原理：
+
+```java
+// 启用ConfigurationProperties功能：
+// 这个ConfigurationProperties里面引入了一个类，这个类就是启用指定类的ConfigurationProperties功能
+// 有了这个@EnableConfigurationPropertie注解以后相当于把配置文件中对应值就和这个HttpEncodingProperties.class类绑定起来了。
+@EnableConfigurationProperties(HttpEncodingProperties.class) 
+// 判断当前是不是web应用，@Conditional是spring底层，意思就是根据不同的条件，来进行自己不同的条件判断，如果满足指定的条件，那么整个配置类里边的配置才会生效。
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+// 看这个类里边有没有这个过滤器，就是判断当前项目里边有没有CharacterEncodingFilter这个类，这个CharacterEncodingFilter类是Springmvc中乱码解决的过滤器。
+@ConditionalOnClass(CharacterEncodingFilter.class)
+// 判断配置文件中是否存在某个配置，就是是否存在spring.http.encoding.enabled这个配置，matchIfMissing的意思就是如果不存在也认为这个判断是正确的，即使配置文件中不配置spring.http.encoding.enabled=true这个属性，也是默认生效的
+@ConditionalOnProperty(prefix = "spring.http.encoding", value = "enabled", matchIfMissing = true)
+public class HttpEncodingAutoConfiguration 
+```
 
 
 
