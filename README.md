@@ -14,11 +14,7 @@
 
 ## Java
 
-[Spring](Java/Spring.md)
-
-[SpringMVC](Java/SpringMVC.md)
-
-[SpringCloud](Java/SpringCloud.md)
+[Spring](Java/Spring/README.md)
 
 ## 数据库
 
