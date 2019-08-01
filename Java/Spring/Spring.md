@@ -169,7 +169,7 @@ public @interface EnableAutoConfiguration
 ImportSelector有一个方法：**selectImports()**
 
 ``` java
-@Override
+	@Override
 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
 		if (!isEnabled(annotationMetadata)) {
 			return NO_IMPORTS;
