@@ -51,13 +51,3 @@ Redis 官方提出了一种权威的基于 Redis 实现分布式锁的方式名�
 
 对于需求性能的分布式锁应用它太重了且成本高；对于需求正确性的应用来说它不够安全。如果应用只需要高性能的分布式锁不要求多高的正确性，那么单节点 Redis 够了；如果应用想要保住正确性，那么不建议 Redlock（在客户端进行写操作时，无法保证客户端能在写入数据之前感知到锁过期），建议使用一个合适的一致性协调系统，例如 Zookeeper，且保证存在 fencing token。
 
-
-
-### 参考资料
-
-[RedLock官方文档翻译](http://ifeve.com/redis-lock/)
-
-[JavaGuide](https://github.com/Snailclimb/JavaGuide/blob/master/docs/database/Redis/Redlock分布式锁.md)
-
-[互联网 Java 工程师进阶知识完全扫盲](https://github.com/doocs/advanced-java)
-

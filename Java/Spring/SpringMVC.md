@@ -32,9 +32,3 @@ SpringMVC 框架是以请求为驱动，围绕 Servlet 设计，将请求发给�
 7. `DispaterServlet` 把返回的 `Model` 传给 `View`（视图渲染）。
 8. 把 `View` 返回给请求者（浏览器）
 
-
-
-### 参考资料
-
-[JavaGuide](https://github.com/Snailclimb/JavaGuide/blob/master/docs/system-design/framework/spring/SpringMVC-Principle.md)
-

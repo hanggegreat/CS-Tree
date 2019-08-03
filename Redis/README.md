@@ -12,3 +12,14 @@
 
 [一些场景问题](一些场景问题.md)
 
+
+
+
+
+### 参考资料
+
+- 《redis设计与实现第二版》
+- [RedLock官方文档翻译](http://ifeve.com/redis-lock/)
+- [JavaGuide](https://github.com/Snailclimb/JavaGuide/blob/master/docs/database/Redis/Redlock分布式锁.md)
+- [互联网 Java 工程师进阶知识完全扫盲](https://github.com/doocs/advanced-java)
+
