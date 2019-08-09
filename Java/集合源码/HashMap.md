@@ -41,8 +41,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     
     // 这个字段决定了当hash表至少为多大时，链表才能进行树化。这个设计是合理的
     // 当hash表中保存的元素个数少于64时，很有可能是因为容量过小导致的hash冲突
-    // 这时进行一次扩容操作基本上就能解决冲突问题。
-    // 链表转为红黑树是非常小概率的事件。
+    // 这时进行一次扩容操作基本上就能解决冲突问题
     static final int MIN_TREEIFY_CAPACITY = 64;
 
     // 哈希表中实际存储的节点类型
