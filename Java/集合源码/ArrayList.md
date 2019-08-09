@@ -344,15 +344,6 @@ public class ArrayList<E> extends AbstractList<E>
             throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
     }
 
-    /**
-     * Constructs an IndexOutOfBoundsException detail message.
-     * Of the many possible refactorings of the error handling code,
-     * this "outlining" performs best with both server and client VMs.
-     */
-    private String outOfBoundsMsg(int index) {
-        return "Index: "+index+", Size: "+size;
-    }
-
     // 删除存在于指定集合中的所有元素。 
     public boolean removeAll(Collection<?> c) {
         Objects.requireNonNull(c);
