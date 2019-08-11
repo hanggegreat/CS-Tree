@@ -202,7 +202,7 @@ public String[] selectImports(AnnotationMetadata annotationMetadata) {
 }
 ```
 
-在`getAutoConfigurationEntry(autoConfigurationMetadata, annotationMetadata)`中实际调用了`SpringFactoriesLoader.loadSpringFactories()`方法，它其实是去加载  **"META-INF/spring.factories"**这个外部文件。这个外部文件里面有很多自动配置的类：
+在`getAutoConfigurationEntry(autoConfigurationMetadata, annotationMetadata)`中实际调用了`SpringFactoriesLoader.loadSpringFactories()`方法，它其实是去加载  **"META-INF/spring.factories"** 这个外部文件。这个外部文件里面有很多自动配置的类：
 
 ![image-20190801194432543](assets/image-20190801194432543.png)
 
