@@ -535,12 +535,11 @@ public class ListNode {
 public class Solution {
     public ListNode ReverseList(ListNode head) {
         ListNode dummy = new ListNode(0);
-        ListNode node = head;
-        while (node != null) {
-            ListNode temp = node.next;
-            node.next = dummy.next;
-            dummy.next = node;
-            node = temp;
+        while (head != null) {
+            ListNode next = head.next;
+            head.next = dummy.next;
+            dummy.next = head;
+            head = next;
         }
         return dummy.next;
     }
@@ -572,19 +571,18 @@ public class ListNode {
 public class Solution {
     public ListNode Merge(ListNode list1,ListNode list2) {
         ListNode dummy = new ListNode(0);
-        ListNode curr = dummy;
+        ListNode pre = dummy;
         while (list1 != null && list2 != null) {
-            if (list1.val <= list2.val) {
-                curr.next = list1;
-                curr = list1;
+            if (list1.val < list2.val) {
+                pre.next = list1;
                 list1 = list1.next;
             } else {
-                curr.next = list2;
-                curr = list2;
+                pre.next = list2;
                 list2 = list2.next;
             }
+            pre = pre.next;
         }
-        curr.next = list1 != null ? list1 : list2;
+        pre.next = list1 == null ? list2 : list1;
         return dummy.next;
     }
 }
@@ -614,22 +612,22 @@ public class TreeNode {
 ```java
 public class Solution {
     public boolean HasSubtree(TreeNode root1,TreeNode root2) {
-        if (root1 == null || root2 == null) { //如果A，B有一个为null，则直接返回false
+        if (root1 == null || root2 == null) {
             return false;
         }
-        // B树为A树当前结点的子结构，或者B树为A树当前结点的左子树的子结构，或者B树为A树当前结点的右子树的子结构
-        return isSubtree(root1, root2) || HasSubtree(root1.left, root2) || HasSubtree(root1.right, root2);
+        return isSubtree(root1, root2) 
+            || HasSubtree(root1.left, root2) || HasSubtree(root1.right, root2);
     }
     
-    private boolean isSubtree(TreeNode rootA, TreeNode rootB) {
-        if (rootB == null) {// B树为空，说明其已经完成遍历并且能够对应上
+    private boolean isSubtree(TreeNode root1, TreeNode root2) {
+        if (root2 == null) {
             return true;
         }
-        if (rootA == null) {// A树为空，说明其不能完全包含B树
+        if (root1 == null) {
             return false;
         }
-        // 要使得B树为A树的子结构，需要保证A树当前结点的值等于B树根结点的值，且B树的左右子树也为A树当前结点的左右子树的子结构
-        return (rootA.val == rootB.val) && isSubtree(rootA.left, rootB.left) && isSubtree(rootA.right, rootB.right);
+        return root1.val == root2.val 
+            && isSubtree(root1.left, root2.left) && isSubtree(root1.right, root2.right);
     }
 }
 ```
@@ -680,38 +678,33 @@ public class Solution {
 **Solution**
 
 ```java
-import java.util.ArrayList;
 public class Solution {
     public ArrayList<Integer> printMatrix(int [][] matrix) {
-        ArrayList<Integer> res = new ArrayList<>();
+        ArrayList<Integer> res = new  ArrayList<>();
         if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
             return res;
         }
-        
-        int left = 0;
-        int right = matrix[0].length - 1;
-        int top = 0;
-        int bottom = matrix.length - 1;
-        while (left <= right && top <= bottom) {
-            for (int i = left; i <= right; i++) {// 打印上面一行
-                res.add(matrix[top][i]);
+        int l = 0, r = matrix[0].length - 1, t = 0, b = matrix.length - 1;
+        while (l <= r && t <= b) {
+            for (int i = l; i <= r; i++) {
+                res.add(matrix[t][i]);
             }
-            top++;
-            for (int i = top; i <= bottom; i++) {// 打印右边一列
-                res.add(matrix[i][right]);
+            t++;
+            for (int i = t; i <= b; i++) {
+                res.add(matrix[i][r]);
             }
-            right--;
-            if (top > bottom || left > right) {// 已打印完毕
+            r--;
+            if (l > r || t > b) {
                 return res;
             }
-            for (int i = right; i >= left; i--){// 打印底部一行
-                res.add(matrix[bottom][i]);
+            for (int i = r; i >= l; i--) {
+                res.add(matrix[b][i]);
             }
-            bottom--;
-            for (int i = bottom; i >= top; i--){// 打印左边一列
-                res.add(matrix[i][left]);
+            b--;
+            for (int i = b; i >= t; i--) {
+                res.add(matrix[i][l]);
             }
-            left++;
+            l++;
         }
         return res;
     }
@@ -740,33 +733,24 @@ public class TreeNode {
 **Solution**
 
 ```java
-/**
-* 开辟两个栈，一个保存当前每次插入后的最小值，一个保存数据
-*/
-import java.util.Stack;
-
 public class Solution {
-    private Stack<Integer> dataStack = new Stack<>();
+    private Stack<Integer> stack = new Stack<>();
     private Stack<Integer> minStack = new Stack<>();
-
+    
     public void push(int node) {
-        dataStack.push(node);
-        if (minStack.isEmpty()) {
-            minStack.push(node);
-        } else {
-            minStack.push(Math.min(node, minStack.peek()));
-        }
+        stack.push(node);
+        minStack.push((minStack.isEmpty() || node < minStack.peek()) ? node : minStack.peek());
     }
-
+    
     public void pop() {
-        dataStack.pop();
+        stack.pop();
         minStack.pop();
     }
-
+    
     public int top() {
-        return dataStack.peek();
+        return stack.peek();
     }
-
+    
     public int min() {
         return minStack.peek();
     }
@@ -782,27 +766,18 @@ public class Solution {
 **Solution**
 
 ```java
-/**
-* 本题题意为：给定两个数组，将第一个数组按照某种顺序全部压入并弹出栈，第二个数组为其弹出顺序
-* 思路：开辟一个栈，然后模拟数组压入顺序，
-* 若栈顶元素与第二个数组当前位置元素相同，则要弹出，并向后移动第二数组位置
-*/
-
-import java.util.*;
-
 public class Solution {
     public boolean IsPopOrder(int [] pushA,int [] popA) {
-        if (pushA == null || popA == null || pushA.length != popA.length) {
+        if (pushA.length != popA.length) {
             return false;
         }
-        
         Stack<Integer> stack = new Stack<>();
-        int popPosition = 0;
+        int popIndex = 0;
         for (int i = 0; i < pushA.length; i++) {
             stack.push(pushA[i]);
-            while (!stack.isEmpty() &&  stack.peek() == popA[popPosition]) {
+            while (!stack.isEmpty() && popA[popIndex] == stack.peek()) {
                 stack.pop();
-                popPosition++;
+                popIndex++;
             }
         }
         return stack.isEmpty();
@@ -862,7 +837,6 @@ public class Solution {
         if (sequence == null || sequence.length == 0) {
             return false;
         }
-        
         return verify(sequence, 0, sequence.length - 1);
     }
     
@@ -993,6 +967,53 @@ public class Solution {
         }
         
         return newHead;
+    }
+}
+
+/*
+public class RandomListNode {
+    int label;
+    RandomListNode next = null;
+    RandomListNode random = null;
+
+    RandomListNode(int label) {
+        this.label = label;
+    }
+}
+*/
+public class Solution {
+    public RandomListNode Clone(RandomListNode pHead) {
+        if (pHead == null) {
+            return pHead;
+        }
+        
+        // 复制每个结点并插入到其后面
+        RandomListNode node = pHead;
+        while (node != null) {
+            RandomListNode next = node.next;
+            node.next = new RandomListNode(node.label);
+            node.next.next = next;
+            node = next;
+        }
+        
+        // 将random指针值赋予新节点
+        node = pHead;
+        while (node != null) {
+            node.next.random = node.random == null ? null : node.random.next;
+            node = node.next.next;
+        }
+        
+        // 分离新旧结点
+        RandomListNode dummy = new RandomListNode(0);
+        RandomListNode pre = dummy;
+		node = pHead;
+        while (node != null) {
+            pre.next = node.next;
+            pre = pre.next;
+            node.next = node.next.next;
+            node = node.next;
+        }
+        return dummy.next;
     }
 }
 ```
