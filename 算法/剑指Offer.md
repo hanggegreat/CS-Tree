@@ -1000,10 +1000,9 @@ public class Solution {
     // 解法一：非递归中序遍历
     public TreeNode Convert(TreeNode pRootOfTree) {
         Stack<TreeNode> stack = new Stack<>();
-        TreeNode head = null;
         TreeNode node = pRootOfTree;
+        TreeNode root = null;
         TreeNode pre = null;
-
         while (!stack.isEmpty() || node != null) {
             while (node != null) {
                 stack.push(node);
@@ -1011,17 +1010,16 @@ public class Solution {
             }
             node = stack.pop();
             if (pre == null) {
-                pre = node;
-                head = node;
+                root = node;
+                node.left = null;
             } else {
-                pre.right = node;
                 node.left = pre;
-                pre = node;
+                pre.right = node;
             }
+            pre = node;
             node = node.right;
         }
-
-        return head;
+        return root;
     }
 
     // 解法二：递归中序遍历
@@ -1057,41 +1055,40 @@ public class Solution {
 
 ```
 输入一个字符串,长度不超过9(可能有字符重复),字符只包括大小写字母。
-
 ```
 
 **Solution**
 
 ```java
-import java.util.*;
-
 public class Solution {
-    private ArrayList<String> res = new ArrayList<>();
+    private ArrayList<String> list = new ArrayList<>();
     private boolean[] visited;
     
     public ArrayList<String> Permutation(String str) {
         if (str == null || str.length() == 0) {
-            return res;
+            return list;
         }
-        
+        char[] chs = str.toCharArray();
+        Arrays.sort(chs);
         visited = new boolean[str.length()];
-        permutation(str, 0, "");
-        return res;
+        permute(chs, new StringBuilder(), visited);
+        return list;
     }
     
-    private void permutation(String str, int index, String curr) {
-        if (index == str.length()) {
-            res.add(curr);
+    private void permute(char[] chs, StringBuilder sb, boolean[] visited) {
+        if (sb.length() == chs.length) {
+            list.add(sb.toString());
             return;
         }
-        
-        // 去重
-        Set<Character> set = new HashSet<>();
-        for (int i = 0; i < str.length(); i++) {
-            if (!visited[i] && !set.contains(str.charAt(i))) {
+        for (int i = 0; i < chs.length; i++) {
+            if (i > 0 && chs[i] == chs[i - 1] && !visited[i - 1]) {
+                continue;
+            }
+            if (!visited[i]) {
                 visited[i] = true;
-                set.add(str.charAt(i));
-                permutation(str, index + 1, curr + str.charAt(i));
+                sb.append(chs[i]);
+                permute(chs, sb, visited);
+                sb.deleteCharAt(sb.length() - 1);
                 visited[i] = false;
             }
         }
@@ -1108,27 +1105,28 @@ public class Solution {
 **Solution**
 
 ```java
-/*
-* 用Map记录元素个数
-*/
-
-import java.util.*;
-
 public class Solution {
     public int MoreThanHalfNum_Solution(int [] array) {
-        if (array == null || array.length == 0) {
-            return 0;
-        }
-
-        Map<Integer, Integer> map = new HashMap<>();
-        int capacity = array.length >> 1;
-        for (int num : array) {
-            map.put(num, map.getOrDefault(num, 0) + 1);
-            if (map.get(num) > capacity) {
-                return num;
+        int res = array[0];
+        int count = 1;
+        for (int i = 1; i < array.length; i++) {
+            if (res == array[i]) {
+                count++;
+            } else {
+                count--;
+                if (count == 0) {
+                    res = array[i];
+                    count = 1;
+                }
             }
         }
-        return 0;
+        count = 0;
+        for (int a : array) {
+            if (a == res) {
+                count++;
+            }
+        }
+        return count * 2 > array.length ? res : 0;
     }
 }
 ```
