@@ -1573,32 +1573,21 @@ public class Solution {
 **Solution**
 
 ```java
-import java.util.*;
-
 //num1,num2分别为长度为1的数组。传出参数
 //将num1[0],num2[0]设置为返回结果
 public class Solution {
-    public void FindNumsAppearOnce(int[] array, int num1[], int num2[]) {
-        if (array == null || array.length < 2) {
-            return;
+    public void FindNumsAppearOnce(int [] array,int num1[] , int num2[]) {
+        int temp = 0;
+        for (int a : array) {
+            temp ^= a;
         }
-        int sum = 0;
-        for (int num : array) {
-            sum ^= num;
-        }
+        temp &= -temp;
         
-        int index = 0;
-        for (; index < 32; index++) {
-            if ((sum & (1 << index)) != 0) {
-                break;
-            }
-        }
-        
-        for (int num : array) {
-            if ((num & (1 << index)) == 0) {
-                num1[0] ^= num;
+        for (int a : array) {
+            if ((a & temp) == 0) {
+                num1[0] ^= a;
             } else {
-                num2[0] ^= num;
+                num2[0] ^= a;
             }
         }
     }
@@ -1620,8 +1609,6 @@ public class Solution {
 **Solution**
 
 ```java
-import java.util.ArrayList;
-
 public class Solution {
     public ArrayList<ArrayList<Integer>> FindContinuousSequence(int sum) {
         ArrayList<ArrayList<Integer>> res = new ArrayList<>();
@@ -1699,13 +1686,25 @@ public class Solution {
 
 ```java
 public class Solution {
-    public String LeftRotateString(String str, int n) {
-        if (str == null || str.length() < 2) {
-            return str;
+    public String LeftRotateString(String str,int n) {
+        n = str.length() == 0 ? 0 : n % str.length();
+        char[] chs = str.toCharArray();
+        reverse(chs, 0, n - 1);
+        reverse(chs, n, str.length() - 1);
+        reverse(chs, 0, str.length() - 1);
+        return new String(chs);
+    }
+    
+    private void reverse(char[] chs, int i, int j) {
+        while (i < j) {
+            swap(chs, i++, j--);
         }
-        
-        int k = n % str.length();
-        return str.substring(k) + str.substring(0, k);
+    }
+    
+    private void swap(char[] chs, int i, int j) {
+        char temp = chs[i];
+        chs[i] = chs[j];
+        chs[j] = temp;
     }
 }
 ```
@@ -1721,17 +1720,28 @@ public class Solution {
 ```java
 public class Solution {
     public String ReverseSentence(String str) {
-        // str = " "的情况容易忽略
-        if (str == null || str.trim().isEmpty()) {
-            return str;
+        char[] chs = str.toCharArray();
+        int j = 0;
+        for (int i = 0; i <= str.length(); i++) {
+            if (i == str.length() || str.charAt(i) == ' ') {
+                reverse(chs, j, i - 1);
+                j = i + 1;
+            }
         }
+        reverse(chs, 0, str.length() - 1);
+        return new String(chs);
+    }
 
-        StringBuilder sb = new StringBuilder();
-        String[] temp = str.split(" ");
-        for (int i = temp.length - 1; i > 0; i--) {
-            sb.append(temp[i]).append(" ");
+    private void reverse(char[] chs, int i, int j) {
+        while (i < j) {
+            swap(chs, i++, j--);
         }
-        return sb.append(temp[0]).toString();
+    }
+
+    private void swap(char[] chs, int i, int j) {
+        char temp = chs[i];
+        chs[i] = chs[j];
+        chs[j] = temp;
     }
 }
 ```
@@ -1830,15 +1840,8 @@ public class Solution {
 
 ```java
 public class Solution {
-    public int Add(int num1, int num2) {
-        while (num2 != 0) {
-            // 异或相当于求和
-            int sum = (num1 ^ num2);
-            // 与再左移一位相当于进位
-            num2 = (num1 & num2) << 1;
-            num1 = sum;
-        }
-        return num1;
+    public int Add(int a,int b) {
+        return b == 0 ? a : Add(a ^ b, (a & b) << 1);
     }
 }
 ```
@@ -1882,27 +1885,21 @@ public class Solution {
 ```java
 public class Solution {
     public int StrToInt(String str) {
-        if (str == null || "".equals(str)) {
+        if (str.length() == 0) {
             return 0;
         }
-        
-        int index = 0;
-        int flag = 1;
+        int isNegative = str.charAt(0) == '-' ? -1 : 1;
         int res = 0;
-        if (str.charAt(index) == '+') {
-            index++;
-        } else if (str.charAt(index) == '-') {
-            index++;
-            flag = -1;
-        }
-        
-        while (index < str.length()) {
-            if (str.charAt(index) < '0' || str.charAt(index) > '9') {
+        for (int i = 0; i < str.length(); i++) {
+            if (i == 0 && (str.charAt(i) == '+' || str.charAt(i) == '-')) {
+                continue;
+            }
+            if (str.charAt(i) < '0' || str.charAt(i) > '9') {
                 return 0;
             }
-            res = res * 10 + str.charAt(index++) - '0';
+            res = res * 10 + str.charAt(i) - '0';
         }
-        return flag * res;
+        return isNegative * res;
     }
 }
 ```
@@ -1916,23 +1913,24 @@ public class Solution {
 **Solution**
 
 ```java
-import java.util.*;
-
 public class Solution {
-    public boolean duplicate(int numbers[], int length, int[] duplication) {
-        if (numbers == null || numbers.length == 0) {
-            return false;
-        }
-        // 保存元素，判断是否存在
-        Set<Integer> set = new HashSet<>();
-        for (int number : numbers) {
-            if (set.contains(number)) {
-                duplication[0] = number;
-                return true;
+    public boolean duplicate(int numbers[],int length,int [] duplication) {
+        for (int i = 0; i < length; i++) {
+            while (numbers[i] != i) {
+                if (numbers[numbers[i]] == numbers[i]) {
+                    duplication[0] = numbers[i];
+                    return true;
+                }
+                swap(numbers, i, numbers[i]);
             }
-            set.add(number);
         }
         return false;
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int t = nums[i];
+        nums[i] = nums[j];
+        nums[j] = t;
     }
 }
 ```
