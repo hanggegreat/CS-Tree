@@ -190,35 +190,28 @@ public class TreeNode {
 **Solution**
 
 ```java
-/**
-* 先序遍历第一个位置肯定是根节点node，
-* 中序遍历的根节点位置在中间i，在i左边的肯定是node的左子树的中序数组，i右边的肯定是node的右子树的中序数组
-* 另一方面，先序遍历的第二个位置到i，也是node左子树的先序子数组，剩下i右边的就是node的右子树的先序子数组
-* 把四个段找出来，分左右递归调用即可
-*/
 public class Solution {
-    public TreeNode reConstructBinaryTree(int [] pre,int [] in) {
-        if (pre == null || in == null || pre.length != in.length || pre.length == 0) {
+    private Map<Integer, Integer> map = new HashMap<>();
+    
+    public TreeNode reConstructBinaryTree(int[] pre, int[] in) {
+        if (pre.length != in.length || pre.length == 0) {
             return null;
         }
-        
-        return reBuildTree(pre, in, 0, pre.length - 1, 0, in.length - 1);
+        for(int i = 0; i < in.length; i++) {
+            map.put(in[i], i);
+        }
+        return rebuild(pre, in, 0, pre.length - 1, 0, in.length - 1);
     }
-    
-    private TreeNode reBuildTree(int[] pre, int[] in, int ps, int pe, int is, int ie) {
+
+    private TreeNode rebuild(int[] pre, int[] in, int ps, int pe, int is, int ie) {
         if (ps > pe || is > ie) {
             return null;
         }
-        
-        TreeNode node = new TreeNode(pre[ps]);
-        for (int i = is; i <= ie; i++) {
-            if (in[i] == pre[ps]) {
-                node.left = reBuildTree(pre, in, ps + 1, ps + i - is, is, i - 1);
-                node.right = reBuildTree(pre, in, ps + i - is + 1, pe, i + 1, ie);
-            }
-            break;
-        }
-        return node;
+        TreeNode root = new TreeNode(pre[ps]);
+        int index = map.get(pre[ps]);
+        root.left = rebuild(pre, in, ps + 1, index - is + ps, is, index);
+        root.right = rebuild(pre, in, index - is + ps + 1, pe, index + 1, ie);
+        return root;
     }
 }
 ```
@@ -264,28 +257,19 @@ public class Solution {
 
 ```java
 /**
-* 二分查找的变形
+* 二分查找
 */
 public class Solution {
     public int minNumberInRotateArray(int [] array) {
-        if (array == null || array.length == 0) {
-            return 0;
-        }
-        
-        int l = 0;
-        int r = array.length - 1;
-        
-        while (l <= r) {
-            int mid = l + (r - l) / 2;
-            if (array[mid] > array[r]) {
-                l = mid + 1;
-            } else if (array[mid] == array[r]) {
-                r--;
+        int l = 0, r = array.length;
+        while (l < r) {
+            int m = l + r >> 1;
+            if (array[m] <= array[array.length - 1]) {
+                r = m;
             } else {
-                r = mid;
+                l = m + 1;
             }
         }
-        
         return array[l];
     }
 }
@@ -309,16 +293,16 @@ n<=39
 */
 public class Solution {
     public int Fibonacci(int n) {
-        int res = 0;
-        int pre = 1;
-        
-        for (int i = 0; i < n; i++) {
-            int temp = res;
-            res += pre;
+        if (n < 1) {
+            return n;
+        }
+        int pre = 0, cur = 1;
+        for (int i = 1; i < n; i++) {
+            int temp = cur;
+            cur += pre;
             pre = temp;
         }
-        
-        return res;
+        return cur;
     }
 }
 ```
@@ -365,9 +349,6 @@ public class Solution {
 */
 public class Solution {
     public int JumpFloorII(int target) {
-        if (target < 2) {
-            return 1;
-        }
         return 1 << (target - 1);
     }
 }
@@ -414,18 +395,14 @@ public class Solution {
 **Solution**
 
 ```java
-/**
-* 循环右移，直至n == 0，每次判断最后一位二进制是否为1，若为1，则计数器加1
-*/
 public class Solution {
     public int NumberOf1(int n) {
-        int count = 0;
-        while(n != 0) {
-            count += (n & 1);
-            n >>>= 1;
+        int res = 0;
+        while (n != 0) {
+            res++;
+            n &= (n - 1);
         }
-        
-        return count;
+        return res;
     }
 }
 ```
@@ -439,25 +416,21 @@ public class Solution {
 **Solution**
 
 ```java
-/**
-* 指数取绝对值，然后求 base ^ Math.abs(exponent)
-* 若exponent为负，则在求倒数
-*/
 public class Solution {
     public double Power(double base, int exponent) {
         if (exponent == 0) {
-            return 1.0;
+            return 1;
         }
-        
-        return (exponent >>> 31 == 1) ? (1.0 / myPower(base, Math.abs(exponent))) : myPower(base, Math.abs(exponent));
-    }
-    
-    private double myPower(double base, int exponent) {
-        double res = 1.0;
-        for (int i = 0; i < exponent; i++) {
+        if (exponent == 1) {
+            return base;
+        }
+        boolean isNegative = exponent < 0;
+        exponent = Math.abs(exponent);
+        double res = Power(base * base, exponent >>> 1);
+        if ((exponent & 1) != 0) {
             res *= base;
         }
-        return res;
+        return isNegative ? 1 / res : res;
     }
 }
 ```
@@ -471,23 +444,22 @@ public class Solution {
 **Solution**
 
 ```java
-/**
-*  插入法
-*/
 public class Solution {
     public void reOrderArray(int [] array) {
-        if (array == null || array.length == 0) {
-            return;
-        }
-        
-        int lastOdd = -1; // 记录排好序的最后一个奇数位置
+        int[] temp = array.clone();
+        int oddIndex = 0;
+        int evenIndex = 0;
         for (int i = 0; i < array.length; i++) {
             if ((array[i] & 1) == 1) {
-                int temp = array[i];
-                for (int j = i; i > lastOdd + 1; i--) {
-                    array[i] = array[i - 1];
-                }
-                array[++lastOdd] = temp;
+                evenIndex++;
+            }
+        }
+        
+        for (int i = 0; i < temp.length; i++) {
+            if ((temp[i] & 1) == 1) {
+                array[oddIndex++] = temp[i];
+            } else {
+                array[evenIndex++] = temp[i];
             }
         }
     }
@@ -516,27 +488,19 @@ public class ListNode {
 **Solution**
 
 ```java
-/**
-* 快慢指针法，快指针先移动k - 1位
-*/
-import java.util.Stack;
 public class Solution {
-    public ListNode FindKthToTail(ListNode head, int k) {
-        if (head == null || k <= 0) {
-            return null;
-        }
-
-        ListNode slow = head;
+    public ListNode FindKthToTail(ListNode head,int k) {
         ListNode fast = head;
-        for (int i = 1; i < k; i++) {
-            fast = fast.next;
+        ListNode slow = head;
+        for (int i = 0; i < k; i++) {
             if (fast == null) {
                 return null;
             }
-        }
-        while(fast.next != null) {
-            slow = slow.next;
             fast = fast.next;
+        }
+        while (fast != null) {
+            fast = fast.next;
+            slow = slow.next;
         }
         return slow;
     }
