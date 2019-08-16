@@ -943,53 +943,6 @@ public class Solution {
         // 复制每个结点并插入到其后面
         RandomListNode node = pHead;
         while (node != null) {
-            RandomListNode newNode = new RandomListNode(node.label);
-            newNode.next = node.next;
-            node.next = newNode;
-            node = newNode.next;
-        }
-        
-        // 将random指针值赋予新节点
-        node = pHead;
-        while (node != null) {
-            node.next.random = node.random == null ? null : node.random.next;
-            node = node.next.next;
-        }
-        
-        // 分离新旧结点
-        RandomListNode newHead = pHead.next;
-        node = pHead;
-        while (node != null) {
-            RandomListNode newNode = node.next;
-            node.next = newNode.next;
-            newNode.next = node.next == null ? null : node.next.next;
-            node = node.next;
-        }
-        
-        return newHead;
-    }
-}
-
-/*
-public class RandomListNode {
-    int label;
-    RandomListNode next = null;
-    RandomListNode random = null;
-
-    RandomListNode(int label) {
-        this.label = label;
-    }
-}
-*/
-public class Solution {
-    public RandomListNode Clone(RandomListNode pHead) {
-        if (pHead == null) {
-            return pHead;
-        }
-        
-        // 复制每个结点并插入到其后面
-        RandomListNode node = pHead;
-        while (node != null) {
             RandomListNode next = node.next;
             node.next = new RandomListNode(node.label);
             node.next.next = next;
@@ -1006,7 +959,7 @@ public class Solution {
         // 分离新旧结点
         RandomListNode dummy = new RandomListNode(0);
         RandomListNode pre = dummy;
-		node = pHead;
+        node = pHead;
         while (node != null) {
             pre.next = node.next;
             pre = pre.next;
