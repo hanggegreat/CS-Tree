@@ -256,15 +256,15 @@ public class Solution {
 **Solution**
 
 ```java
-/**
-* 二分查找
-*/
 public class Solution {
     public int minNumberInRotateArray(int [] array) {
-        int l = 0, r = array.length;
+        if (array.length == 0) {
+            return 0;
+        }
+        int l = 0, r = array.length - 1;
         while (l < r) {
             int m = l + r >> 1;
-            if (array[m] <= array[array.length - 1]) {
+            if (array[m] < array[array.length - 1]) {
                 r = m;
             } else {
                 l = m + 1;
@@ -1140,55 +1140,50 @@ public class Solution {
 **Solution**
 
 ```java
-import java.util.*;
+import java.util.ArrayList;
 
 public class Solution {
-
-    public ArrayList<Integer> GetLeastNumbers_Solution(int [] input, int k) {
+    public ArrayList<Integer> GetLeastNumbers_Solution(int[] input, int k) {
         ArrayList<Integer> res = new ArrayList<>();
-        if (input == null || k > input.length || k <= 0) {
+        if (k-- > input.length) {
             return res;
         }
-
         int l = 0, r = input.length - 1;
         while (l < r) {
-            int pos = partition(input, l, r);
-            if (pos == k) {
+            int p = partition(input, l, r);
+            if (p == k) {
                 break;
             }
-            if (pos < k) {
-                l = pos + 1;
-            } else  {
-                r = pos - 1;
+            if (p < k) {
+                l = p + 1;
+            } else {
+                r = p - 1;
             }
         }
-        
-        for (int i = 0; i < k; i++) {
+        for (int i = 0; i <= k; i++) {
             res.add(input[i]);
         }
         return res;
     }
-    
-    private int partition(int[] array, int start, int end) {
-        int temp = array[start];
+
+    private int partition(int[] input, int start, int end) {
+        int temp = input[start];
         int i = start, j = end;
         while (i < j) {
-            while (i < j && array[j] > temp) {
+            while (i < j && input[j] > temp) {
                 j--;
             }
-            while (i < j && array[i] <= temp) {
+            while (i < j && input[i] <= temp) {
                 i++;
             }
-            
             if (i < j) {
-                swap(array, i, j);
+                swap(input, i, j);
             }
         }
-        
-        swap(array, start, i);
+        swap(input, start, i);
         return i;
     }
-    
+
     private void swap(int[] array, int i, int j) {
         int temp = array[i];
         array[i] = array[j];
@@ -1206,18 +1201,10 @@ HZ偶尔会拿些专业问题来忽悠那些非计算机专业的同学。今天
 **Solution**
 
 ```java
-/*
-* 动态规划
-* max保存当前最大值，res保存全局最大值
-*/
 public class Solution {
     public int FindGreatestSumOfSubArray(int[] array) {
-        if (array == null || array.length == 0) {
-            return 0;
-        }
-        
-        int res = array[0];// 保存全局最大值
-        int max = array[0];// 保存当前最大值
+        int res = array[0];
+        int max = array[0];
         for (int i = 1; i < array.length; i++) {
             max = Math.max(max + array[i], array[i]);
             res = Math.max(res, max);
@@ -1269,22 +1256,21 @@ public class Solution {
 **Solution**
 
 ```java
-/**
-* 转化为流处理，将数字转化为字符串，然后比较s1 + s2 与 s2 + s1的大小，进行排序，再拼接为字符串即可
-*/
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class Solution {
     public String PrintMinNumber(int[] numbers) {
         if (numbers == null || numbers.length == 0) {
             return "";
         }
-
-        return Arrays.stream(numbers)
-                .mapToObj(String::valueOf)
-                .sorted((s1, s2) -> (s1 + s2).compareTo(s2 + s1))
-                .collect(Collectors.joining());
+        String[] nums = new String[numbers.length];
+        for (int i = 0; i < numbers.length; i++) {
+            nums[i] = String.valueOf(numbers[i]);
+        }
+        Arrays.sort(nums, (s1, s2) -> (s1 + s2).compareTo(s2 + s1));
+        StringBuilder sb = new StringBuilder();
+        for (String str : nums) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 }
 ```
@@ -1300,20 +1286,14 @@ public class Solution {
 ```java
 public class Solution {
     public int GetUglyNumber_Solution(int index) {
-        if (index < 7) { // 前6个丑数为其自身
+        if (index <= 6) {
             return index;
         }
-
         int[] array = new int[index];
         array[0] = 1;
-        //i2，i3，i5分别为三个队列的指针
-        int i2 = 0;
-        int i3 = 0;
-        int i5 = 0;
-        for (int i = 1; i < array.length; i++) {
-            //选出三个队列头最小的数
+        int i2 = 0, i3 = 0, i5 = 0;
+        for (int i = 1; i < index; i++) {
             array[i] = Math.min(Math.min(array[i2] * 2, array[i3] * 3), array[i5] * 5);
-            //这三个if有可能进入一个或者多个，进入多个是三个队列头最小的数有多个的情况
             if (array[i] == array[i2] * 2) {
                 i2++;
             }
@@ -1324,7 +1304,6 @@ public class Solution {
                 i5++;
             }
         }
-
         return array[index - 1];
     }
 }
@@ -1339,24 +1318,24 @@ public class Solution {
 **Solution**
 
 ```java
-import java.util.*;
+import java.util.BitSet;
 
 public class Solution {
     public int FirstNotRepeatingChar(String str) {
-        if (str == null || str.length() < 1) {
-            return -1;
-        }
-        
-        Map<Character, Integer> map = new HashMap<>();
+        BitSet bitSet1 = new BitSet(256);
+        BitSet bitSet2 = new BitSet(256);
         for (int i = 0; i < str.length(); i++) {
-            map.put(str.charAt(i), map.getOrDefault(str.charAt(i), 0) + 1);
+            if (!bitSet1.get(str.charAt(i)) && !bitSet2.get(str.charAt(i))) {
+                bitSet1.set(str.charAt(i));
+            } else {
+                bitSet2.set(str.charAt(i));
+            }
         }
         for (int i = 0; i < str.length(); i++) {
-            if (map.get(str.charAt(i)) == 1) {
+            if (bitSet1.get(str.charAt(i)) && !bitSet2.get(str.charAt(i))) {
                 return i;
             }
         }
-        
         return -1;
     }
 }
@@ -1400,52 +1379,42 @@ public class Solution {
 
 ```java
 public class Solution {
-    private int res = 0;
+    private long cnt = 0;
     private int[] temp;
-    
+
     public int InversePairs(int [] array) {
-        if (array == null || array.length < 2) {
-            return 0;
-        }
-        
         temp = new int[array.length];
-        mergeSortAndCalc(array, 0, array.length - 1);
-        return res;
+        mergeSort(array, 0, array.length - 1);
+        return (int) (cnt % 1000000007);
     }
-    
-    // 归并排序
-    private void mergeSortAndCalc(int[] array, int start, int end) {
+
+    private void mergeSort(int[] array, int start, int end) {
         if (start >= end) {
             return;
         }
-        
-        int mid = start + ((end - start) >> 1);
-        mergeSortAndCalc(array, start, mid);
-        mergeSortAndCalc(array, mid + 1, end);
-        
+        int mid = start + end >> 1;
+        mergeSort(array, start, mid);
+        mergeSort(array, mid + 1, end);
         merge(array, start, mid, end);
     }
-    
-    // 将一个数组中的两个相邻有序区间合并成一个
-    private void merge(int array[], int start, int mid, int end) {
-        int i = start, j = mid + 1, k = 0;
-        while (i <= mid && j <= end) {
-            if (array[i] <= array[j]) {
+
+    private void merge(int[] array, int start, int mid, int end) {
+        int k = 0;
+        int i = start, j = mid + 1;
+        while (i <= mid || j <= end) {
+            if (i > mid) {
+                temp[k++] = array[j++];
+            } else if (j > end) {
+                temp[k++] = array[i++];
+            } else if (array[i] < array[j]) {
                 temp[k++] = array[i++];
             } else {
                 temp[k++] = array[j++];
-                res += mid - i + 1;
-                res %= 1000000007;
+                cnt += mid - i + 1;
             }
         }
-        while (i <= mid) {
-            temp[k++] = array[i++];
-        }
-        while (j <= end) {
-            temp[k++] = array[j++];
-        }
-        for(int m = 0; m < k; m++) {
-            array[m + start] = temp[m];
+        for (i = 0; i < k; i++) {
+            array[start + i] = temp[i];
         }
     }
 }
@@ -1485,29 +1454,37 @@ public class Solution {
 **Solution**
 
 ```java
-// 因为data中都是整数，所以可以稍微变一下，不是搜索k的两个位置，而是搜索k-0.5和k+0.5这两个数应该插入的位置，然后相减即可。
-
 public class Solution {
-    public int GetNumberOfK(int[] array, int k) {
-        if (array == null || array.length == 0) {
-            return 0;
-        }
-        return binarySearch(array, k + 0.5) - binarySearch(array, k - 0.5);
+    public int GetNumberOfK(int[] array , int k) {
+        int first = searchFirst(array, k);
+        int last = searchLast(array, k);
+        return (first >= array.length || array[first] != k) ? 0 : (last - first + 1);
     }
     
-    private int binarySearch(int[] array, double k) {
-        int left = 0;
-        int right = array.length - 1;
-        
-        while (right >= left) {
-            int mid = left + ((right - left) >> 1);
-            if (array[mid] > k) {
-                right = mid - 1;
+    private int searchFirst(int[] array, int k) {
+        int l = 0, r = array.length - 1;
+        while (l < r) {
+            int m = l + r >> 1;
+            if (array[m] >= k) {
+                r = m;
             } else {
-                left = mid + 1;
+                l = m + 1;
             }
         }
-        return left;
+        return l;
+    }
+    
+    private int searchLast(int[] array, int k) {
+        int l = 0, r = array.length - 1;
+        while (l < r) {
+            int m = l + r + 1 >> 1;
+            if (array[m] <= k) {
+                l = m;
+            } else {
+                r = m - 1;
+            }
+        }
+        return l;
     }
 }
 ```
