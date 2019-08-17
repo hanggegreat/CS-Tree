@@ -216,7 +216,7 @@
 **Solution:**
 
 ```java
-class Solution {
+public class Solution {
     public int[] twoSum(int[] nums, int target) {
         Map<Integer, Integer> map = new HashMap<>();
         for (int i = 0; i < nums.length; i++) {
@@ -261,22 +261,24 @@ public class ListNode {
 **Solution:**
 
 ```java
-class Solution {
+public class Solution {
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        int carry = 0;
         ListNode dummy = new ListNode(0);
-        
-        int sum = 0; // 结果
-        int more = 0; // 进位
         ListNode pre = dummy;
-        while (l1 != null || l2 != null || more > 0) {
-            sum = (l1 == null ? 0 : l1.val) + (l2 == null ? 0 : l2.val) + more;
-            more = sum / 10;
-            sum %= 10;
-            ListNode node = new ListNode(sum);
-            pre.next = node;
-            pre = node;
-            l1 = l1 == null ? null : l1.next;
-            l2 = l2 == null ? null : l2.next;
+        while (l1 != null || l2 != null || carry == 1) {
+            pre.next = new ListNode(carry);
+            pre = pre.next;
+            if (l1 != null) {
+                pre.val += l1.val;
+                l1 = l1.next;
+            }
+            if (l2 != null) {
+                pre.val += l2.val;
+                l2 = l2.next;
+            }
+            carry = pre.val / 10;
+            pre.val %= 10;
         }
         return dummy.next;
     }
@@ -317,17 +319,12 @@ class Solution {
 **Solution:**
 
 ```java
-class Solution {
+public class Solution {
     public int lengthOfLongestSubstring(String s) {
-        if (s == null || s.length() < 1) {
-            return 0;
-        }
-        
         int[] map = new int[256];
-        int l = 0;
-        int r = 0; // 滑动窗口为[l, r)，其间为不重复的元素
+        int l = 0, r = 0;
         int res = 0;
-        while (l < s.length()) {
+        while (l <= r && l < s.length()) {
             if (r < s.length() && map[s.charAt(r)] == 0) {
                 map[s.charAt(r++)]++;
                 res = Math.max(res, r - l);
@@ -373,34 +370,28 @@ nums2 = [3, 4]
 ```java
 public class Solution {
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        // 保证nums1不是最长的，时间复杂度可转化为O(log(Min(m, n)))
-        if (nums1.length > nums2.length) {
-            return findMedianSortedArrays(nums2, nums1);
+        int l = nums1.length + nums2.length + 1 >> 1;
+        int r = nums1.length + nums2.length + 2 >> 1;
+        return (find(nums1, nums2, 0, 0, l) + find(nums1, nums2, 0, 0, r)) / 2.0;
+    }
+    
+    private double find(int[] nums1, int[] nums2, int start1, int start2, int k) {
+        if (start1 >= nums1.length) {
+            return nums2[start2 + k - 1];
         }
-
-        int left = 0;
-        int right = nums1.length;
-        int halfLen = (nums1.length + nums2.length + 1) >> 1;
-
-        while (left <= right) {
-            int i = (left + right) >> 1; // nums1[i, nums1.length)为要分割的右半部分
-            int j = halfLen - i; // nums2[j, nums2.length)为要分割的右半部分
-            if (i < right && nums2[j - 1] > nums1[i]) { // nums1分割点此时需要右移
-                left++;
-            } else if (i > left && nums1[i - 1] > nums2[j]) { // nums1 分割点此时需要左移
-                right--;
-            } else {
-                int leftMax = (i == 0) ? nums2[j - 1] :
-                        (j == 0 ? nums1[i - 1] : Math.max(nums1[i - 1], nums2[j - 1]));
-                if (((nums1.length + nums2.length) & 1) == 1) {
-                    return leftMax * 1.0;
-                }
-                int rightMin = (i == nums1.length) ? nums2[j] :
-                        (j == nums2.length ? nums1[i] : Math.min(nums1[i], nums2[j]));
-                return (leftMax + rightMin) / 2.0;
-            }
+        if (start2 >= nums2.length) {
+            return nums1[start1 + k - 1];
         }
-        return 0.0;
+        
+        if (k == 1) {
+            return Math.min(nums1[start1], nums2[start2]);
+        }
+        
+        int mid1 = start1 + k / 2 - 1 >= nums1.length ? Integer.MAX_VALUE : nums1[start1 + k / 2 - 1];
+        int mid2 = start2 + k / 2 - 1 >= nums2.length ? Integer.MAX_VALUE : nums2[start2 + k / 2 - 1];
+        
+        return mid1 > mid2 ? find(nums1, nums2, start1, start2 + k / 2, k - k / 2) :
+            find(nums1, nums2, start1 + k / 2, start2, k - k / 2);
     }
 }
 ```
@@ -429,33 +420,30 @@ public class Solution {
 **Solution：**
 
 ```java
-/**
- * 中心扩展法
- */
 public class Solution {
     private int left;
     private int len;
-
+    
     public String longestPalindrome(String s) {
-        if (s == null || s.length() < 2) {
+        if (s.length() < 2) {
             return s;
         }
-
+        
         for (int i = 0; i < s.length(); i++) {
-            find(s, i, i); // 奇数长度
-            find(s, i, i + 1); // 偶数长度
+            find(s, i, i);
+            find(s, i - 1, i);
         }
         return s.substring(left, left + len);
     }
-
-    private void find(String s, int left, int right) {
-        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
-            if (right - left + 1 > len) {
-                len = right - left + 1;
-                this.left = left;
+    
+    private void find(String s, int l, int r) {
+        while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
+            if (r - l + 1 > len) {
+                left = l;
+                len = r - l + 1;
             }
-            right++;
-            left--;
+            r++;
+            l--;
         }
     }
 }
@@ -588,24 +576,18 @@ public class Solution {
 **Solution：**
 
 ```java
-/**
-* 利用滑动窗口解决
-*/
 public class Solution {
     public int maxArea(int[] height) {
         int res = 0;
-        int left = 0;
-        int right = height.length - 1;
-        
-        while (left < right) {
-            res = Math.max(res, Math.min(height[left], height[right]) * (right - left));
-            if (height[left] < height[right]) {
-                left++;
+        int l = 0, r = height.length - 1;
+        while (l < r) {
+            res = Math.max(res, Math.min(height[l], height[r]) * (r - l));
+            if (height[l] < height[r]) {
+                l++;
             } else {
-                right--;
+                r--;
             }
         }
-        
         return res;
     }
 }
@@ -632,31 +614,22 @@ public class Solution {
 **Solution：**
 
 ```java
-/**
- * 采用滑动窗口，时间复杂度为：O(n log(n))
- */
 public class Solution {
     public List<List<Integer>> threeSum(int[] nums) {
-        List<List<Integer>> list = new ArrayList<>();
-        if (nums == null || nums.length < 3) {
-            return list;
-        }
-
-        // 先排序，同时避免求重复解
+        List<List<Integer>> res = new ArrayList<>();
         Arrays.sort(nums);
-
-        for (int i = 0; i < nums.length - 2 && nums[i] <= 0;) {
-            int l = i + 1;
-            int r = nums.length - 1;
+        for (int i = 0; i < nums.length && nums[i] <= 0; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int l = i + 1, r = nums.length - 1;
             while (l < r) {
-                int sum = nums[i] + nums[l] + nums[r];
+                int sum = nums[l] + nums[r] + nums[i];
                 if (sum == 0) {
-                    list.add(Arrays.asList(nums[i], nums[l++], nums[r--]));
-                    while (l < r && nums[l] == nums[l - 1]) {
-                        l++;
+                    res.add(Arrays.asList(nums[i], nums[l], nums[r]));
+                    while (l < r && nums[l] == nums[++l]) {
                     }
-                    while (r > l && nums[r] == nums[r + 1]) {
-                        r--;
+                    while (l < r && nums[r] == nums[--r]) {
                     }
                 } else if (sum < 0) {
                     l++;
@@ -664,12 +637,8 @@ public class Solution {
                     r--;
                 }
             }
-            i++;
-            while (i < nums.length - 2 && nums[i] == nums[i - 1]) {
-                i++;
-            }
         }
-        return list;
+        return res;
     }
 }
 ```
@@ -698,27 +667,27 @@ public class Solution {
 
 ```java
 public class Solution {
-    private List<String> res = new ArrayList<>();
     private String[] map = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
-
+    private List<String> res = new ArrayList<>();
+    
     public List<String> letterCombinations(String digits) {
-        if (digits == null || digits.length() < 1) {
+        if (digits.length() == 0) {
             return res;
         }
-
-        dfs(digits, 0, "");
+        dfs(digits, 0, new StringBuilder());
         return res;
     }
-
-    private void dfs(String digits, int index, String str) {
+    
+    private void dfs(String digits, int index, StringBuilder sb) {
         if (index == digits.length()) {
-            res.add(str);
+            res.add(sb.toString());
             return;
         }
-        
-        String dict = map[digits.charAt(index) - '0'];
-        for (int i = 0; i < dict.length(); i++) {
-            dfs(digits, index + 1, str + dict.charAt(i));
+        char[] chs = map[digits.charAt(index) - '0'].toCharArray();
+        for (char c : chs) {
+            sb.append(c);
+            dfs(digits, index + 1, sb);
+            sb.deleteCharAt(sb.length() - 1);
         }
     }
 }
@@ -749,9 +718,6 @@ public class Solution {
 **Solution：**
 
 ```java
-/*
-* 双指针
-*/
 public class Solution {
     public ListNode removeNthFromEnd(ListNode head, int n) {
         ListNode dummy = new ListNode(0);

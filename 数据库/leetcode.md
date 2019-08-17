@@ -194,14 +194,11 @@ END
 #### Solution:
 
 ```sql
-SELECT Score,
-	(
-		SELECT COUNT(DISTINCT Score)
-		FROM Scores
-		WHERE Score >= s.Score
-	) AS Rank
-FROM Scores s
-ORDER BY s.Score DESC;
+SELECT s1.Score, COUNT(DISTINCT s2.Score) Rank
+FROM Scores s1
+JOIN Scores s2 ON s1.Score <= s2.Score
+GROUP BY s1.Id, s1.Score
+ORDER BY s1.Score DESC
 ```
 
 
@@ -239,12 +236,10 @@ ORDER BY s.Score DESC;
 #### Solution:
 
 ```sql
-SELECT DISTINCT l1.Num AS ConsecutiveNums
+SELECT DISTINCT l1.Num ConsecutiveNums
 FROM Logs l1, Logs l2, Logs l3
-WHERE l1.Id = l2.Id - 1
-	AND l2.Id = l3.Id - 1
-	AND l1.Num = l2.Num
-	AND l2.Num = l3.Num;
+WHERE l1.Id = l2.Id - 1 AND l2.Id = l3.Id - 1 
+    AND l1.Num = l2.Num AND l2.Num = l3.Num
 ```
 
 
