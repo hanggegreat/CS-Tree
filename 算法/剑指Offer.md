@@ -1914,7 +1914,7 @@ public class Solution {
 
 ```java
 public class Solution {
-    public boolean duplicate(int numbers[],int length,int [] duplication) {
+    public boolean duplicate(int[] numbers, int length, int[] duplication) {
         for (int i = 0; i < length; i++) {
             while (numbers[i] != i) {
                 if (numbers[numbers[i]] == numbers[i]) {
@@ -2058,27 +2058,20 @@ public class Solution {
 **Solution**
 
 ```java
-import java.util.LinkedHashMap;
-
-/**
- * LinkedHashMap利用双向链表保存了键的插入顺序
- */
 public class Solution {
-    private LinkedHashMap<Character, Integer> map = new LinkedHashMap<>();
-
-    //Insert one char from stringstream
+    private Queue<Character> queue = new LinkedList<>();
+    private int[] map = new int[256];
+    
     public void Insert(char ch) {
-        map.put(ch, map.getOrDefault(ch, 0) + 1);
+        queue.offer(ch);
+        map[ch]++;
+        while (!queue.isEmpty() && map[queue.peek()] > 1) {
+            queue.poll();
+        }
     }
 
-    //return the first appearence once char in current stringstream
     public char FirstAppearingOnce() {
-        for (Character character : map.keySet()) {
-            if (map.get(character) == 1) {
-                return character;
-            }
-        }
-        return '#';
+        return queue.isEmpty() ? '#' : queue.peek();
     }
 }
 ```
@@ -2113,8 +2106,8 @@ public class ListNode {
  */
 public class Solution {
     public ListNode EntryNodeOfLoop(ListNode pHead) {
-        ListNode slow = pHead;
         ListNode fast = pHead;
+        ListNode slow = pHead;
         while (fast != null && fast.next != null) {
             fast = fast.next.next;
             slow = slow.next;
@@ -2122,15 +2115,15 @@ public class Solution {
                 break;
             }
         }
-        if (fast != null && fast.next == null) {
+        if (fast == null || fast.next == null) {
             return null;
         }
+        
         slow = pHead;
         while (slow != fast) {
             slow = slow.next;
             fast = fast.next;
         }
-
         return slow;
     }
 }
@@ -2163,18 +2156,17 @@ public class Solution {
         ListNode dummy = new ListNode(0);
         dummy.next = pHead;
         ListNode pre = dummy;
-        ListNode curr = pHead;
-        while (curr != null) {
-            if (curr.next != null && curr.next.val == curr.val) {
-                int temp = curr.val;
-                curr = curr.next.next;
-                while (curr != null && curr.val == temp) {
-                    curr = curr.next;
+        ListNode cur = pHead;
+        while (cur != null) {
+            if (cur.next != null && cur.next.val == cur.val) {
+                int temp = cur.val;
+                while (pre.next != null && pre.next.val == temp) {
+                    pre.next = pre.next.next;
                 }
-                pre.next = curr;
+                cur = pre.next;
             } else {
-                pre = curr;
-                curr = curr.next;
+                pre = cur;
+                cur = cur.next;
             }
         }
         return dummy.next;
@@ -2211,7 +2203,6 @@ public class Solution {
         if (pNode == null) {
             return null;
         }
-        // 右节点不为空，说明下一个结点在右子树，只需在右子树往左下沉
         if (pNode.right != null) {
             pNode = pNode.right;
             while (pNode.left != null) {
@@ -2219,13 +2210,12 @@ public class Solution {
             }
             return pNode;
         }
-        // 右节点为空，说明向下一个结点是所在左子树的父节点或所在右子树的父节点的父节点
-        // 但是不管怎样，只要向上回溯，找到第一个父节点的左节点为当前节点的节点即可，其父节点就是要找的中序遍历下一个节点
         while (pNode.next != null) {
-            if (pNode.next.left == pNode) {
-                return pNode.next;
+            TreeLinkNode next = pNode.next;
+            if (next.left == pNode) {
+                return next;
             }
-            pNode = pNode.next;
+            pNode = next;
         }
         return null;
     }
@@ -2267,11 +2257,12 @@ public class Solution {
         if (left == null && right == null) {
             return true;
         }
-        if (left == null || right == null || left.val != right.val) {
+        if (left == null || right == null) {
             return false;
         }
-        return isSymmetrical(left.left, right.right) && isSymmetrical(left.right, right.left);
-    }
+        return left.val == right.val && isSymmetrical(left.left, right.right) 
+            && isSymmetrical(left.right, right.left);
+}
 }
 ```
 
@@ -2298,55 +2289,42 @@ public class TreeNode {
 **Solution**
 
 ```java
-/**
- * 使用双向队列保存每一层的节点
- * 奇数层从头部取节点，采用尾插法保存，
- * 偶数层从尾部取节点，采用头插法保存
- */
 public class Solution {
     public ArrayList<ArrayList<Integer>> Print(TreeNode pRoot) {
         ArrayList<ArrayList<Integer>> res = new ArrayList<>();
         if (pRoot == null) {
             return res;
         }
-        LinkedList<TreeNode> queue = new LinkedList<>();
-        TreeNode node = pRoot;
-        int count = 1;
+        LinkedList<TreeNode> deque = new LinkedList<>();
+        deque.offer(pRoot);
         int level = 1;
-        queue.offerFirst(node);
-        while (!queue.isEmpty()) {
-            int size = 0;
+        while (!deque.isEmpty()) {
+            int size = deque.size();
             ArrayList<Integer> list = new ArrayList<>();
-            while (count-- > 0) {
-                if ((level & 1) == 1) { // 奇数层，从左到右打印
-                    node = queue.pollFirst();
+            while (size-- > 0) {
+                if ((level & 1) == 1) {
+                    TreeNode node = deque.pollFirst();
+                    list.add(node.val);
                     if (node.left != null) {
-                        queue.offerLast(node.left);
-                        size++;
+                        deque.offerLast(node.left);
                     }
                     if (node.right != null) {
-                        queue.offerLast(node.right);
-                        size++;
+                        deque.offerLast(node.right);
                     }
+                } else {
+                    TreeNode node = deque.pollLast();
                     list.add(node.val);
-                } else { // 偶数层，从右往左打印
-                    node = queue.pollLast();
                     if (node.right != null) {
-                        queue.offerFirst(node.right);
-                        size++;
+                        deque.offerFirst(node.right);
                     }
                     if (node.left != null) {
-                        queue.offerFirst(node.left);
-                        size++;
+                        deque.offerFirst(node.left);
                     }
-                    list.add(node.val);
                 }
             }
             res.add(list);
             level++;
-            count = size;
         }
-
         return res;
     }
 }
@@ -2383,26 +2361,21 @@ public class Solution {
         }
         Queue<TreeNode> queue = new LinkedList<>();
         queue.offer(pRoot);
-        int count = 1;// 记录当前层多少结点
-        while (count > 0) {
+        
+        while (queue.size() > 0) {
+            int size = queue.size();
             ArrayList<Integer> list = new ArrayList<>();
-            int nextCount = 0;
-            while (count-- > 0) {
+            while (size-- > 0) {
                 TreeNode node = queue.poll();
                 list.add(node.val);
                 if (node.left != null) {
                     queue.offer(node.left);
-                    nextCount++;
                 }
                 if (node.right != null) {
                     queue.offer(node.right);
-                    nextCount++;
                 }
             }
-            if (list.size() > 0) {
-                res.add(list);
-            }
-            count = nextCount;
+            res.add(list);
         }
         return res;
     }
@@ -2434,37 +2407,32 @@ public class TreeNode {
 ```java
 public class Solution {
     private int index = -1;
-    
+
     public String Serialize(TreeNode root) {
         if (root == null) {
-            return "#,";
+            return "#!";
         }
-        
         StringBuilder sb = new StringBuilder();
-        sb.append(root.val).append(",");
+        sb.append(root.val).append('!');
         sb.append(Serialize(root.left));
         sb.append(Serialize(root.right));
         return sb.toString();
     }
 
     public TreeNode Deserialize(String str) {
-        if (str == null) {
-            return null;
-        }
-        
-        String[] values = str.split(",");
-        return helper(values);
+        String[] splits = str.split("!");
+        return helper(splits);
     }
-    
-    private TreeNode helper(String[] values) {
+
+    private TreeNode helper(String[] splits) {
         index++;
-        if ("#".equals(values[index])) {
+        if ("#".equals(splits[index])) {
             return null;
         }
-        TreeNode node = new TreeNode(Integer.valueOf(values[index]));
-        node.left = helper(values);
-        node.right = helper(values);
-        return node;
+        TreeNode root = new TreeNode(Integer.parseInt(splits[index]));
+        root.left = helper(splits);
+        root.right = helper(splits);
+        return root;
     }
 }
 ```
@@ -2492,23 +2460,19 @@ public class TreeNode {
 **Solution**
 
 ```java
-/**
-* 中序遍历
-*/
 public class Solution {
     public TreeNode KthNode(TreeNode pRoot, int k) {
         int count = 0;
         Stack<TreeNode> stack = new Stack<>();
         TreeNode node = pRoot;
-        
+
         while (node != null || !stack.isEmpty()) {
             while (node != null) {
                 stack.push(node);
                 node = node.left;
             }
             node = stack.pop();
-            count++;
-            if (count == k) {
+            if (++count == k) {
                 return node;
             }
             node = node.right;
@@ -2525,18 +2489,13 @@ public class Solution {
 如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。
 
 ```java
-import java.util.*;
-
-/**
- * 使用一个小顶堆和一个大顶堆，可以保证小顶堆的数都大于大顶堆，并且二者元素个数只差为0或1
- */
 public class Solution {
-    private int count = 0;
-    private Queue<Integer> minHeap = new PriorityQueue<>();
-    private Queue<Integer> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
-
+    private Queue<Integer> minHeap = new PriorityQueue<>((o1, o2) -> o1 - o2);
+    private Queue<Integer> maxHeap = new PriorityQueue<>((o1, o2) -> o2 - o1);
+    private int n;
+    
     public void Insert(Integer num) {
-        if (count++ % 2 == 1) {
+        if ((n++ & 1) == 0) {
             maxHeap.offer(num);
             minHeap.offer(maxHeap.poll());
         } else {
@@ -2546,7 +2505,8 @@ public class Solution {
     }
 
     public Double GetMedian() {
-        return count % 2 == 1 ? maxHeap.peek() * 1.0 : ((minHeap.peek() + maxHeap.peek()) / 2.0);
+        return ((n & 1) == 1) ? 
+            (double) minHeap.peek() : ((minHeap.peek() + maxHeap.peek()) / 2.0);
     }
 }
 ```
@@ -2558,32 +2518,21 @@ public class Solution {
 给定一个数组和滑动窗口的大小，找出所有滑动窗口里数值的最大值。例如，如果输入数组{2,3,4,2,6,2,5,1}及滑动窗口的大小3，那么一共存在6个滑动窗口，他们的最大值分别为{4,4,6,6,6,5}； 针对数组{2,3,4,2,6,2,5,1}的滑动窗口有以下6个： {[2,3,4],2,6,2,5,1}， {2,[3,4,2],6,2,5,1}， {2,3,[4,2,6],2,5,1}， {2,3,4,[2,6,2],5,1}， {2,3,4,2,[6,2,5],1}， {2,3,4,2,6,[2,5,1]}。
 
 ```java
-import java.util.*;
-
 public class Solution {
-    public ArrayList<Integer> maxInWindows(int[] num, int size) {
+    public ArrayList<Integer> maxInWindows(int [] num, int size) {
         ArrayList<Integer> res = new ArrayList<>();
-        if (num == null || num.length < size || size <= 0) {
+        if (size > num.length || size < 1) {
             return res;
         }
-        LinkedList<Integer> queue = new LinkedList<>();
-
-        for (int i = 0; i < size - 1; i++) {
-            while(!queue.isEmpty() && num[queue.peekLast()] < num[i]) {
-                queue.pollLast();
-            }
-            queue.offerLast(i);
+        Queue<Integer> maxHeap = new PriorityQueue<>((o1, o2) -> o2 - o1);
+        for (int i = 0; i < size; i++) {
+            maxHeap.offer(num[i]);
         }
-
-        for (int i = size - 1; i < num.length; i++) {
-            while(!queue.isEmpty() && num[queue.peekLast()] < num[i]) {
-                queue.pollLast();
-            }
-            queue.offerLast(i);
-            if (i - queue.peekFirst() + 1 > size) {
-                queue.pollFirst();
-            }
-            res.add(num[queue.peekFirst()]);
+        res.add(maxHeap.peek());
+        for (int i = size; i < num.length; i++) {
+            maxHeap.remove(num[i - size]);
+            maxHeap.offer(num[i]);
+            res.add(maxHeap.peek());
         }
         return res;
     }
@@ -2600,47 +2549,42 @@ public class Solution {
 
 ```java
 public class Solution {
-    private int index = 0;
     private boolean[] visited;
+    private int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
     public boolean hasPath(char[] matrix, int rows, int cols, char[] str) {
-        if (matrix == null || str == null) {
+        if (rows == 0 || cols == 0) {
             return false;
         }
-
-        visited = new boolean[rows * cols];
+        visited = new boolean[matrix.length];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                if (helper(matrix, rows, cols, str, i, j)) {
+                if (dfs(matrix, str, rows, cols, i, j, 0)) {
                     return true;
                 }
             }
         }
         return false;
     }
-
-    private boolean helper(char[] matrix, int rows, int cols, char[] str, int row, int col) {
+    
+    private boolean dfs(char[] matrix, char[] str, int rows, int cols, int r, int c, int index) {
         if (index == str.length) {
             return true;
         }
-
-        boolean flag = false;
-        if (col < cols && col >= 0
-                && row < rows && row >= 0
-                && str[index] == matrix[row * cols + col]
-                && !visited[row * cols + col]) {
-            visited[row * cols + col] = true;
-            index++;
-            flag = helper(matrix, rows, cols, str, row + 1, col)
-                    || helper(matrix, rows, cols, str, row - 1, col)
-                    || helper(matrix, rows, cols, str, row, col - 1)
-                    || helper(matrix, rows, cols, str, row, col + 1);
-            if (!flag) {
-                index--;
-                visited[row * cols + col] = false;
+        int idx = r * cols + c;
+        if (r < 0 || r >= rows || c < 0 || c >= cols || visited[idx] || matrix[idx] != str[index]) {
+            return false;
+        }
+        boolean res = false;
+        visited[idx] = true;
+        for (int[] d : directions) {
+            if (dfs(matrix, str, rows, cols, r + d[0], c + d[1], index + 1)) {
+                res = true;
+                break;
             }
         }
-        return flag;
+        visited[idx] = false;
+        return res;
     }
 }
 ```
@@ -2657,6 +2601,7 @@ public class Solution {
 public class Solution {
     private int res = 0;
     private boolean[][] visited;
+    private int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     
     public int movingCount(int threshold, int rows, int cols) {
         visited = new boolean[rows][cols];
@@ -2664,26 +2609,25 @@ public class Solution {
         return res;
     }
     
-    private void dfs(int threshold, int rows, int cols, int row, int col) {
-        if (row < rows && col < cols && bitSum(row, col) <= threshold && !visited[row][col]) {
-            visited[row][col] = true;
-            res++;
-            dfs(threshold, rows, cols, row + 1, col);
-            dfs(threshold, rows, cols, row, col + 1);
+    private void dfs(int threshold, int rows, int cols, int r, int c) {
+        if (r < 0 || r >= rows || c < 0 || c >= cols 
+            || visited[r][c] || (sum(r) + sum(c)) > threshold) {
+            return;
+        }
+        res++;
+        visited[r][c] = true;
+        for (int[] d : directions) {
+            dfs(threshold, rows, cols, r + d[0], c + d[1]);
         }
     }
     
-    private int bitSum(int row, int col) {
-        int sum = 0;
-        while (row > 0) {
-            sum += row % 10;
-            row /= 10;
+    private int sum(int a) {
+        int res = 0;
+        while (a > 0) {
+            res += a % 10;
+            a /= 10;
         }
-        while (col > 0) {
-            sum += col % 10;
-            col /= 10;
-        }
-        return sum;
+        return res;
     }
 }
 ```
