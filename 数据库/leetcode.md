@@ -366,10 +366,19 @@ HAVING COUNT(*) > 1;
 #### Solution:
 
 ```sql
+// 1
 SELECT c.Name AS Customers
 FROM Customers c
 	LEFT JOIN Orders o ON c.Id = o.CustomerId
 WHERE o.CustomerId IS NULL;
+
+// 2
+SELECT Name AS Customers
+FROM Customers c
+WHERE c.Id NOT IN(
+    SELECT CustomerId
+    FROM Orders
+)
 ```
 
 
@@ -479,16 +488,14 @@ WHERE temp.DepartmentId = d.Id
 ```
 
 ```sql
-SELECT d.Name Department, e1.Name Employee, Salary
-FROM Department d
-	JOIN Employee e1 ON d.Id = e1.DepartmentId
-WHERE(
+SELECT d.Name Department, e.Name Employee, Salary
+FROM Employee e JOIN Department d ON e.DepartmentId = d.Id
+WHERE (
     SELECT COUNT(DISTINCT Salary)
-    FROM Employee e2
-    WHERE e2.DepartmentId = e1.DepartmentId
-    AND e2.Salary >= e1.Salary
-) <= 3
-ORDER BY DepartmentId, Salary DESC;
+    FROM Employee
+    WHERE Salary > e.Salary AND DepartmentId = e.DepartmentId
+) < 3
+ORDER BY d.Id, Salary DESC;
 ```
 
 
@@ -530,11 +537,11 @@ DELETE FROM Person
 WHERE Id NOT IN (
     SELECT Id
     FROM (
-        SELECT MIN(Id) AS Id
+        SELECT MIN(Id) Id
         FROM Person
-        GROUP BY email
-    ) temp
-);
+        GROUP BY Email
+    ) t
+)
 ```
 
 
@@ -572,10 +579,8 @@ WHERE Id NOT IN (
 
 ```sql
 SELECT w2.Id
-FROM Weather w1
-	JOIN Weather w2
-	ON w1.RecordDate = date_sub(w2.RecordDate, INTERVAL 1 DAY)
-		AND w1.Temperature < w2.Temperature;
+FROM Weather w1 JOIN Weather w2 ON w1.RecordDate = date_sub(w2.RecordDate, INTERVAL 1 DAY)
+WHERE w1.Temperature < w2.Temperature
 ```
 
 
@@ -798,12 +803,9 @@ X 市建了一个新的体育馆，每日人流量信息被记录在这三列信
 ```sql
 SELECT DISTINCT s4.*
 FROM stadium s1, stadium s2, stadium s3, stadium s4
-WHERE s1.id = s2.id - 1
-	AND s2.id = s3.id - 1
-	AND s1.people >= 100
-	AND s2.people >= 100
-	AND s3.people >= 100
-	AND s4.id IN (s1.id, s2.id, s3.id);
+WHERE s1.id = s2.id - 1 AND s2.id = s3.id - 1
+    AND s1.people >= 100 AND s2.people >= 100 AND s3.people >= 100
+    AND s4.id IN(s1.id, s2.id, s3.id)
 ```
 
 
@@ -849,11 +851,10 @@ WHERE s1.id = s2.id - 1
 #### Solution:
 
 ```sql
-SELECT id, movie, description, rating
+SELECT *
 FROM cinema
-WHERE description != 'boring'
-	AND id & 1 = 1
-ORDER BY rating DESC;
+WHERE description != 'boring' AND id & 1 = 1
+ORDER BY rating DESC
 ```
 
 
@@ -911,25 +912,23 @@ ORDER BY rating DESC;
 #### Solution:
 
 ```sql
-SELECT s2.id - 1 AS id, s2.student
-FROM seat s2
-WHERE s2.id & 1 = 0
-UNION
-SELECT s1.id + 1 AS id, s1.student
+SELECT s1.id - 1 AS id, s1.student
 FROM seat s1
-WHERE s1.id & 1 = 1
-	AND s1.id != (
-		SELECT MAX(s3.id)
-		FROM seat s3
-	)
+WHERE s1.id & 1 = 0
+UNION
+SELECT s2.id + 1 AS id, s2.student
+FROM seat s2
+WHERE s2.id & 1 = 1 AND s2.id != (
+    SELECT MAX(id)
+    FROM seat
+)
 UNION
 SELECT *
-FROM seat s4
-WHERE s4.id & 1 = 1
-	AND s4.id = (
-		SELECT MAX(s5.id)
-		FROM seat s5
-	)
+FROM seat s3
+WHERE s3.id & 1 = 1 AND s3.id = (
+    SELECT MAX(id)
+    FROM seat
+)
 ORDER BY id;
 ```
 
@@ -970,5 +969,6 @@ ORDER BY id;
 
 ```sql
 UPDATE salary
-SET sex = IF('m', 'f', 'm');
+SET sex = CHAR(ASCII(sex) ^ ASCII('f') ^ ASCII('m'))
 ```
+
