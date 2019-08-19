@@ -789,21 +789,17 @@ public class Solution {
 
 ```java
 public class Solution {
-    public static boolean isValid(String s) {
-        if (s == null || (s.length() & 1) == 1) {
-            return false;
-        }
-
+    public boolean isValid(String s) {
         Stack<Character> stack = new Stack<>();
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == '[' || s.charAt(i) == '{' || s.charAt(i) == '(') {
-                stack.push(s.charAt(i));
-            } else if (s.charAt(i) == ']' && (stack.isEmpty() || stack.pop() != '[')) {
-                return false;
-            } else if (s.charAt(i) == '}' && (stack.isEmpty() || stack.pop() != '{')) {
-                return false;
-            } else if (s.charAt(i) == ')' && (stack.isEmpty() || stack.pop() != '(')) {
-                return false;
+        for (char c : s.toCharArray()) {
+            if (c == '(' || c == '[' || c == '{') {
+                stack.push(c);
+            } else if (c == ')' && (stack.isEmpty() || stack.pop() != '(')) {
+                    return false;
+            } else if (c == ']' && (stack.isEmpty() || stack.pop() != '[')) {
+                    return false;
+            } else if (c == '}' && (stack.isEmpty() || stack.pop() != '{')) {
+                    return false;
             }
         }
         return stack.isEmpty();
@@ -871,26 +867,27 @@ public class Solution {
 
 ```java
 public class Solution {
-    private List<String> list = new ArrayList<>();
+    private List<String> res = new ArrayList<>();
     
     public List<String> generateParenthesis(int n) {
-        if (n < 1) {
-            return list;
-        }
-        
-        generate(n, 0, 0, "");
-        return list;
+        generate(0, 0, n, new StringBuilder());
+        return res;
     }
     
-    private void generate(int n, int left, int right, String str) {
-        if (left == right && left == n) {
-            list.add(str);
+    private void generate(int l, int r, int n, StringBuilder sb) {
+        if (l == r && l == n) {
+            res.add(sb.toString());
+            return;
         }
-        if (left < n) {
-            generate(n, left + 1, right, str + "(");
+        if (l > r) {
+            sb.append(')');
+            generate(l, r + 1, n, sb);
+            sb.deleteCharAt(sb.length() - 1);
         }
-        if (left > right) {
-            generate(n, left, right + 1, str + ")");
+        if (l < n) {
+            sb.append('(');
+            generate(l + 1, r, n, sb);
+            sb.deleteCharAt(sb.length() - 1);
         }
     }
 }
@@ -922,18 +919,14 @@ public class Solution {
         if (lists == null || lists.length == 0) {
             return null;
         }
-
         ListNode dummy = new ListNode(0);
         ListNode pre = dummy;
-
-        // 使用小顶堆，每次取出的都是最小的节点
-        Queue<ListNode> minHeap = new PriorityQueue<>(Comparator.comparingInt(node -> node.val));
+        Queue<ListNode> minHeap = new PriorityQueue<>((l1, l2) -> l1.val - l2.val);
         for (ListNode list : lists) {
             if (list != null) {
                 minHeap.offer(list);
             }
         }
-
         while (!minHeap.isEmpty()) {
             pre.next = minHeap.poll();
             pre = pre.next;
@@ -941,7 +934,6 @@ public class Solution {
                 minHeap.offer(pre.next);
             }
         }
-
         return dummy.next;
     }
 }
@@ -965,46 +957,35 @@ public class Solution {
 **Solution：**
 
 ```java
-/**
- * 求下一个全排列，可分为两种情况：
- * 1.例如像 5 4 3 2 1这样的序列，已经是最大的排列，即每个位置上的数非递增，这时只需要翻转整个序列即可
- * 2.例如像 1 3 5 4 2这样的序列，要从后往前找到第一个比后面一位小的元素的位置，即第二个位置的3，然后与其后第一个比它大的元素交换位置，得到 1 4 5 3 2，再将 5 3 2翻转得到 1 4 2 3 5即可
- */
-
 public class Solution {
     public void nextPermutation(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return;
-        }
-
         int firstSmall = -1;
-        for (int i = nums.length - 2; i >= 0; i--) {
-            if (nums[i] < nums[i + 1]) {
-                firstSmall = i;
+        for (int i = nums.length - 1; i > 0; i--) {
+            if (nums[i - 1] < nums[i]) {
+                firstSmall = i - 1;
                 break;
             }
         }
-
         if (firstSmall == -1) {
             reverse(nums, 0, nums.length - 1);
             return;
         }
-
-        for (int i = nums.length - 1; i > firstSmall; i--) {
+        
+        for (int i = nums.length - 1; i >= i; i--) {
             if (nums[i] > nums[firstSmall]) {
-                swap(nums, i, firstSmall);
+                swap(nums, firstSmall, i);
                 reverse(nums, firstSmall + 1, nums.length - 1);
-                return;
+                break;
             }
         }
     }
-
+    
     private void swap(int[] nums, int i, int j) {
         int temp = nums[i];
         nums[i] = nums[j];
         nums[j] = temp;
     }
-
+    
     private void reverse(int[] nums, int start, int end) {
         while (start < end) {
             swap(nums, start++, end--);
@@ -1040,13 +1021,9 @@ public class Solution {
 ```java
 public class Solution {
     public int longestValidParentheses(String s) {
-        if (s == null || s.length() < 2) {
-            return 0;
-        }
-
-        int res = 0;
-        int start = 0;
         Stack<Integer> stack = new Stack<>();
+        int start = 0;
+        int res = 0;
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == '(') {
                 stack.push(i);
@@ -1055,7 +1032,7 @@ public class Solution {
                     start = i + 1;
                 } else {
                     stack.pop();
-                    res = stack.isEmpty() ? Math.max(res, i - start + 1) : Math.max(res, i - stack.peek());
+                    res = Math.max(res, stack.isEmpty() ? i - start + 1 : i - stack.peek());
                 }
             }
         }
@@ -1097,36 +1074,35 @@ public class Solution {
 ```java
 public class Solution {
     public int search(int[] nums, int target) {
-        if (nums == null 
-            || nums.length < 1 
-            || (target < nums[0] && target > nums[nums.length - 1])) {
+        if (nums.length < 1) {
             return -1;
         }
-        
-        int low = 0;
-        int high = nums.length - 1;
-        while (low <= high) {
-            int mid = (low + high) >> 1;
-            if (nums[mid] == target) {
-                return mid;
-            }
-            
-            if (nums[mid] >= nums[low]) {// 左边有序
-                if (nums[mid] > target && nums[low] <= target) {// 在有序边
-                    high = mid - 1;
-                } else{// 在无序边
-                    low = mid + 1;
-                }
-            } else {// 右边有序
-                if (nums[mid] < target && nums[high] >= target) {// 在有序边
-                    low = mid + 1;
-                } else {// 在无序边
-                    high = mid - 1;
-                }
+        int l = 0, r = nums.length - 1;
+        while (l < r) {
+            int m = l + r >> 1;
+            if (nums[m] <= nums[nums.length - 1]) {
+                r = m;
+            } else {
+                l = m + 1;
             }
         }
         
-        return -1;
+        if (target <= nums[nums.length - 1]) {
+            r = nums.length - 1;
+        } else {
+            r = l - 1;
+            l = 0;
+        }
+        
+        while (l < r) {
+            int m = l + r >> 1;
+            if (nums[m] >= target) {
+                r = m;
+            } else {
+                l = m + 1;
+            }
+        }
+        return nums[l] == target ? l : -1;
     }
 }
 ```
@@ -1160,32 +1136,38 @@ public class Solution {
 ```java
 public class Solution {
     public int[] searchRange(int[] nums, int target) {
-        if (nums == null || nums.length < 1) {
+        int l = searchFirst(nums, target);
+        int r = searchLast(nums, target);
+        if (l >= nums.length || nums[l] != target) {
             return new int[]{-1, -1};
         }
-        
-        int low = 0;
-        int high = nums.length - 1;
-        while (low <= high) {
-            int mid = (low + high) >> 1;
-            if (nums[mid] < target) {
-                low = mid + 1;
-            } else if (nums[mid] > target) {
-                high = mid - 1;
+        return new int[]{l, r};
+    }
+    
+    private int searchFirst(int[] nums, int target) {
+        int l = 0, r = nums.length - 1;
+        while (l < r) {
+            int m = l + r >> 1;
+            if (nums[m] < target) {
+                l = m + 1;
             } else {
-                int left = mid;
-                int right = mid;
-                while (left >= low && nums[left] == target) {
-                    left--;
-                }
-                while (right <= high && nums[right] == target) {
-                    right++;
-                }
-                return new int[]{left + 1, right -1};
+                r = m;
             }
         }
-        
-        return new int[]{-1, -1};
+        return l;
+    }
+    
+    private int searchLast(int[] nums, int target) {
+        int l = 0, r = nums.length - 1;
+        while (l < r) {
+            int m = l + r + 1 >> 1;
+            if (nums[m] > target) {
+                r = m - 1;
+            } else {
+                l = m;
+            }
+        }
+        return l;
     }
 }
 ```
@@ -1230,24 +1212,20 @@ public class Solution {
 
 ```java
 public class Solution {
-    private List<List<Integer>> res = new ArrayList<>();;
-
+    private List<List<Integer>> res = new ArrayList<>();
+    
     public List<List<Integer>> combinationSum(int[] candidates, int target) {
-        if (candidates == null || candidates.length == 0) {
-            return res;
-        }
         dfs(candidates, 0, target, new ArrayList<>());
         return res;
     }
-
+    
     private void dfs(int[] candidates, int start, int target, List<Integer> list) {
         if (target == 0) {
             res.add(new ArrayList<>(list));
             return;
         }
-
         for (int i = start; i < candidates.length; i++) {
-            if (target >= candidates[i]) {
+            if (candidates[i] <= target) {
                 list.add(candidates[i]);
                 dfs(candidates, i, target - candidates[i], list);
                 list.remove(list.size() - 1);
@@ -1279,27 +1257,19 @@ public class Solution {
 ```java
 public class Solution {
     public int trap(int[] height) {
-        if (height == null || height.length < 3) {
-            return 0;
-        }
-        
-        int low = 0;
-        int high = height.length - 1;
         int res = 0;
-        int lowMax = 0;
-        int highMax = 0;
-        while (low < high) {
-            if (height[low] < height[high]) {
-                lowMax = Math.max(lowMax, height[low]);
-                res += lowMax - height[low];
-                low++;
+        int lMax = 0, rMax = 0;
+        int l = 0, r = height.length - 1;
+        
+        while (l < r) {
+            lMax = Math.max(lMax, height[l]);
+            rMax = Math.max(rMax, height[r]);
+            if (height[l] < height[r]) {
+                res += lMax - height[l++];
             } else {
-                highMax = Math.max(highMax, height[high]);
-                res += highMax - height[high];
-                high--;
+                res += rMax - height[r--];
             }
         }
-        
         return res;
     }
 }
@@ -1332,28 +1302,23 @@ public class Solution {
 public class Solution {
     private List<List<Integer>> res = new ArrayList<>();
     private boolean[] visited;
-
+    
     public List<List<Integer>> permute(int[] nums) {
-        if (nums == null) {
-            return res;
-        }
-        
         visited = new boolean[nums.length];
-        permute(0, nums, new ArrayList());
+        permute(nums, new ArrayList<>());
         return res;
     }
     
-    private void permute(int index, int[] nums, List<Integer> list) {
-        if (index == nums.length) {
-            res.add(new ArrayList(list));
-            return;
+    private void permute(int[] nums, List<Integer> list) {
+        if (list.size() == nums.length) {
+            res.add(new ArrayList<>(list));
         }
         
         for (int i = 0; i < nums.length; i++) {
             if (!visited[i]) {
-                list.add(nums[i]);
                 visited[i] = true;
-                permute(index + 1, nums, list);
+                list.add(nums[i]);
+                permute(nums, list);
                 list.remove(list.size() - 1);
                 visited[i] = false;
             }
@@ -1433,11 +1398,8 @@ public class Solution {
  */
 public class Solution {
     public void rotate(int[][] matrix) {
-        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
-            return;
-        }
-        
         int n = matrix.length;
+        
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < (n >> 1); j++) {
                 swap(matrix, i, j, i, n - j - 1);
@@ -1445,8 +1407,8 @@ public class Solution {
         }
         
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j + i + 1 < n; j++) {
-                swap(matrix, i, j, n - 1 - j, n - 1 - i);
+            for (int j = 0; j < n - i; j++) {
+                swap(matrix, i, j, n - j - 1, n - i - 1);
             }
         }
     }
@@ -1487,30 +1449,24 @@ public class Solution {
 **Solution：**
 
 ```java
-public class Solution {
+public class Solution {    
     public List<List<String>> groupAnagrams(String[] strs) {
-        List<List<String>> res = new ArrayList<>();
-        if (strs == null || strs.length == 0) {
-            return res;
-        }
-
         Map<String, List<String>> map = new HashMap<>();
+        
         for (String str : strs) {
-            int[] counts = new int[26];
-            for (int i = 0; i < str.length(); i++) {
-                counts[str.charAt(i) - 'a']++;
-            }
-
             StringBuilder sb = new StringBuilder();
-            for (int count : counts) {
-                sb.append(' ').append(count);
+            char[] ch = new char[26];
+            for (int i = 0; i < str.length(); i++) {
+                ch[str.charAt(i) - 'a']++;
+            }
+            for (char c : ch) {
+                sb.append(c).append(' ');
             }
             String key = sb.toString();
-            if (!map.containsKey(key)) {
-                map.put(key, new ArrayList<>());
-            }
+            map.putIfAbsent(key, new ArrayList<>());
             map.get(key).add(str);
         }
+        
         return new ArrayList<>(map.values());
     }
 }
@@ -1535,7 +1491,7 @@ public class Solution {
 ```java
 public class Solution {
     public int maxSubArray(int[] nums) {
-        if (nums == null || nums.length == 0) {
+        if (nums.length == 0) {
             return 0;
         }
         
@@ -1579,9 +1535,6 @@ public class Solution {
 **Solution：**
 
 ```java
-/*
-* 从后往前跳
-*/
 public class Solution {
     public boolean canJump(int[] nums) {
         int last = nums.length - 1;
@@ -1693,7 +1646,6 @@ public class Solution {
                 }
             }
         }
-        
         return dp[m - 1][n - 1];
     }
 }
@@ -1837,19 +1789,15 @@ exection -> execution (插入 'u')
 ```java
 public class Solution {
     public int minDistance(String word1, String word2) {
-        if (word1 == null || word2 == null) {
-            return 0;
-        }
-        
         int[][] dp = new int[word1.length() + 1][word2.length() + 1];
-        for (int i = 1; i <= word1.length(); i++) {
+        for (int i = 1; i < dp.length; i++) {
             dp[i][0] = i;
         }
-        for (int i = 1; i <= word2.length(); i++) {
+        for (int i = 0; i < dp[0].length; i++) {
             dp[0][i] = i;
         }
-        for (int i = 0; i < word1.length(); i++) {
-            for (int j = 0; j < word2.length(); j++) {
+        for (int i = 0; i < dp.length - 1; i++) {
+            for (int j = 0; j < dp[0].length - 1; j++) {
                 if (word1.charAt(i) == word2.charAt(j)) {
                     dp[i + 1][j + 1] = dp[i][j];
                 } else {
@@ -1857,7 +1805,6 @@ public class Solution {
                 }
             }
         }
-        
         return dp[word1.length()][word2.length()];
     }
 }
@@ -1949,29 +1896,27 @@ class Solution {
 ```java
 public class Solution {
     public String minWindow(String s, String t) {
-        if (s == null || t == null || s.length() < t.length()) {
-            return "";
-        }
-
         String res = "";
-        int[] sFlag = new int[256];
+        int l = 0, r = 0;
+        
         int[] tFlag = new int[256];
+        int[] sFlag = new int[256];
+        int count = t.length();
+
         for (int i = 0; i < t.length(); i++) {
             tFlag[t.charAt(i)]++;
         }
-        int count = t.length();
-        int l = 0;
-        int r = 0;
+        
         while (l <= s.length() - t.length()) {
             if (count > 0 && r < s.length()) {
                 if (sFlag[s.charAt(r)]++ < tFlag[s.charAt(r++)]) {
                     count--;
                 }
             } else {
-                if (count == 0 && (res.length() == 0 || r - l < res.length())) {
+                if (count == 0 && (res.length() == 0 || res.length() > r - l)) {
                     res = s.substring(l, r);
                 }
-                if (sFlag[s.charAt(l)]-- <= tFlag[s.charAt(l++)]) {
+                if (tFlag[s.charAt(l)] >= sFlag[s.charAt(l++)]--) {
                     count++;
                 }
             }
@@ -2013,10 +1958,6 @@ public class Solution {
     private List<List<Integer>> res = new ArrayList<>();
     
     public List<List<Integer>> subsets(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return res;
-        }
-        
         dfs(nums, 0, new ArrayList<>());
         return res;
     }
@@ -2026,7 +1967,6 @@ public class Solution {
             res.add(new ArrayList<>(list));
             return;
         }
-        
         dfs(nums, index + 1, list);
         list.add(nums[index]);
         dfs(nums, index + 1, list);
