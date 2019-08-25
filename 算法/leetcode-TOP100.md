@@ -521,33 +521,25 @@ p = "mis*is*p*."
 ```java
 public class Solution {
     public boolean isMatch(String s, String p) {
-        if (s == null || p == null) {
-            return false;
+        boolean[][] dp = new boolean[s.length() + 1][p.length() + 1];
+        dp[0][0] = true;
+        for (int i = 2; i <= p.length(); i++) {
+            dp[0][i] = dp[0][i - 2] && p.charAt(i - 1) == '*';
         }
-
-        return isMatch(s, p, 0, 0);
-    }
-
-    private boolean isMatch(String str, String pattern, int s, int p) {
-        // 正则表达式已用尽，如果字符串还未匹配完，则返回false
-        if (p == pattern.length()) {
-            return str.length() == s;
-        }
-        // 正则表达式下一位为*，此时考虑两种情况
-        if (p + 1 < pattern.length() && pattern.charAt(p + 1) == '*') {
-            // 若正则表达式当前位字符与字符串当前位置相匹配，则匹配1位或者0位
-            if (s < str.length() && (str.charAt(s) == pattern.charAt(p) || pattern.charAt(p) == '.')) {
-                return isMatch(str, pattern, s, p + 2) || isMatch(str, pattern, s + 1, p);
+        
+        for (int i = 0; i < s.length(); i++) {
+            for (int j = 0; j < p.length(); j++) {
+                if (s.charAt(i) == p.charAt(j) || p.charAt(j) == '.') {
+                    dp[i + 1][j + 1] = dp[i][j];
+                } else if (j > 0 && p.charAt(j) == '*') {
+                    dp[i + 1][j + 1] = dp[i + 1][j - 1];
+                    if (s.charAt(i) == p.charAt(j - 1) || p.charAt(j - 1) == '.') {
+                        dp[i + 1][j + 1] = dp[i + 1][j - 1] || dp[i][j + 1] || dp[i + 1][j];
+                    }
+                }
             }
-            // 若正则表达式当前位字符与字符串当前位置不匹配，则匹配0位
-            return isMatch(str, pattern, s, p + 2);
         }
-
-        // 匹配1位
-        if (s < str.length() && (str.charAt(s) == pattern.charAt(p) || pattern.charAt(p) == '.')) {
-            return isMatch(str, pattern, s + 1, p + 1);
-        }
-        return false;
+        return dp[s.length()][p.length()];
     }
 }
 ```
@@ -581,12 +573,8 @@ public class Solution {
         int res = 0;
         int l = 0, r = height.length - 1;
         while (l < r) {
-            res = Math.max(res, Math.min(height[l], height[r]) * (r - l));
-            if (height[l] < height[r]) {
-                l++;
-            } else {
-                r--;
-            }
+            int h = height[l] < height[r] ? height[l++] : height[r--];
+            res = Math.max(res, h * (r - l + 1));
         }
         return res;
     }
@@ -2078,16 +2066,13 @@ public class Solution {
 **Solution：**
 
 ```java
-/**
- * 单调栈
- */
 public class Solution {
     public int largestRectangleArea(int[] heights) {
         if (heights == null || heights.length == 0) {
             return 0;
         }
 
-        Stack<Integer> stack = new Stack<>();
+        Stack<Integer> stack = new S tack<>();
         int res = 0;
         for (int i = 0; i <= heights.length; i++) {
             int currentHeight = i == heights.length ? -1 : heights[i];
@@ -2151,6 +2136,32 @@ public class Solution {
         return res;
     }
 }
+
+public class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        if (matrix.length == 0 || matrix[0].length == 0) {
+            return 0;
+        }
+        
+        int res = 0;
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (matrix[i][j] == '1') {
+                    dp[i][j] = j == 0 ? 1 : dp[i][j - 1] + 1;
+                    int minWidth = dp[i][j];
+                    for (int k = i; k >= 0; k--) {
+                        minWidth = Math.min(minWidth, dp[k][j]);
+                        res = Math.max(res, minWidth * (i - k + 1));
+                    }
+                }
+            }
+        }
+        return res;
+    }
+}
 ```
 
 ### 94.二叉树的中序遍历
@@ -2177,7 +2188,7 @@ public class Solution {
 ```java
 public class Solution {
     public List<Integer> inorderTraversal(TreeNode root) {
-        List<Integer> res = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
         Stack<TreeNode> stack = new Stack<>();
         TreeNode node = root;
         while (!stack.isEmpty() || node != null) {
@@ -2186,11 +2197,10 @@ public class Solution {
                 node = node.left;
             }
             node = stack.pop();
-            res.add(node.val);
+            list.add(node.val);
             node = node.right;
         }
-        
-        return res;
+        return list;
     }
 }
 ```
@@ -2343,6 +2353,34 @@ public class Solution {
         return left.val == right.val && isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
     }
 }
+
+public class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        queue.offer(root);
+        
+        while (!queue.isEmpty()) {
+            TreeNode node1 = queue.poll();
+            TreeNode node2 = queue.poll();
+            if (node1 == null && node2 == null) {
+                continue;
+            }
+            if (node1 == null || node2 == null || node1.val != node2.val) {
+                return false;
+            }
+            queue.offer(node1.left);
+            queue.offer(node2.right);
+            queue.offer(node1.right);
+            queue.offer(node2.left);
+        }
+        return true;
+    }
+}
 ```
 
 ### 102.二叉树的层序遍历
@@ -2471,27 +2509,28 @@ public class Solution {
 
 ```java
 public class Solution {
+    private Map<Integer, Integer> map = new HashMap<>();
+    
     public TreeNode buildTree(int[] preorder, int[] inorder) {
-        if (preorder == null || inorder == null || preorder.length != inorder.length || preorder.length == 0) {
+        if (preorder.length == 0 || preorder.length != inorder.length) {
             return null;
+        }
+        
+        for (int i = 0; i < inorder.length; i++) {
+            map.put(inorder[i], i);
         }
         return build(preorder, inorder, 0, preorder.length - 1, 0, inorder.length - 1);
     }
-
+    
     private TreeNode build(int[] preorder, int[] inorder, int ps, int pe, int is, int ie) {
         if (ps > pe || is > ie) {
             return null;
         }
-
-        TreeNode node = new TreeNode(preorder[ps]);
-        for (int i = is; i <= ie; i++) {
-            if (inorder[i] == preorder[ps]) {
-                node.left = build(preorder, inorder, ps + 1, i - is + ps, is, i - 1);
-                node.right = build(preorder, inorder, i - is + ps + 1, pe, i + 1, ie);
-                return node;
-            }
-        }
-        return node;
+        TreeNode root = new TreeNode(preorder[ps]);
+        int index = map.get(preorder[ps]);
+        root.left = build(preorder, inorder, ps + 1, index - is + ps, is, index - 1);
+        root.right = build(preorder, inorder, index - is + ps + 1, pe, index + 1, ie);
+        return root;
     }
 }
 ```
@@ -2675,25 +2714,20 @@ public class Solution {
 ```java
 public class Solution {
     public int longestConsecutive(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return 0;
-        }
-
-        // 以key开始，连续序列长度为value
-        Map<Integer, Integer> map = new HashMap<>();
         int res = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        
         for (int num : nums) {
             if (map.containsKey(num)) {
                 continue;
             }
             map.put(num, 1 + map.getOrDefault(num + 1, 0));
-            // 更新其左边相邻元素的连续序列长度
             while (map.containsKey(num - 1)) {
                 map.put(num - 1, map.get(num--) + 1);
             }
         }
-        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
-            res = Math.max(res, entry.getValue());
+        for (int key : map.keySet()) {
+            res = Math.max(res, map.get(key));
         }
         return res;
     }
@@ -2844,10 +2878,6 @@ public class Solution {
 ```java
 public class Solution {
     public boolean hasCycle(ListNode head) {
-        if (head == null) {
-            return false;
-        }
-        
         ListNode fast = head;
         ListNode slow = head;
         while (fast != null && fast.next != null) {
@@ -3017,26 +3047,27 @@ public class Solution {
         if (head == null || head.next == null) {
             return head;
         }
+        
         ListNode mid = getMid(head);
-        ListNode second = mid.next;
+        ListNode next = mid.next;
         mid.next = null;
-        return merge(sortList(head), sortList(second));
+        return mergeSort(sortList(head), sortList(next));
     }
     
-    private ListNode merge(ListNode first, ListNode second) {
+    private ListNode mergeSort(ListNode l1, ListNode l2) {
         ListNode dummy = new ListNode(0);
         ListNode pre = dummy;
-        while (first != null && second != null) {
-            if (first.val > second.val) {
-                pre.next = second;
-                second = second.next;
+        while (l1 != null && l2 != null) {
+            if (l1.val > l2.val) {
+                pre.next = l2;
+                l2 = l2.next;
             } else {
-                pre.next = first;
-                first = first.next;
+                pre.next = l1;
+                l1 = l1.next;
             }
             pre = pre.next;
         }
-        pre.next = first == null ? second : first;
+        pre.next = l1 == null ? l2 : l1;
         return dummy.next;
     }
     
@@ -3052,7 +3083,7 @@ public class Solution {
 }
 ```
 
-### 152.乘机最大子序列
+### 152.乘积最大子序列
 
 **题目描述：**
 
@@ -3220,10 +3251,6 @@ public class MinStack {
 ```java
 public class Solution {
     public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
-        if (headA == null || headB == null) {
-            return null;
-        }
-        
         ListNode a = headA;
         ListNode b = headB;
         while (a != b) {
@@ -3260,22 +3287,16 @@ public class Solution {
 **Solution：**
 
 ```java
-/**
-* 摩尔投票法
-*/
 public class Solution {
     public int majorityElement(int[] nums) {
-        int count = 1;
         int res = nums[0];
+        int count = 0;
         for (int num : nums) {
             if (num == res) {
                 count++;
-            } else {
-                if (count == 1) {
-                    res = num;
-                } else {
-                    count--;
-                }
+            } else if (--count == 0) {
+                res = num;
+                count = 1;
             }
         }
         return res;
@@ -3366,18 +3387,17 @@ public class Solution {
 
 ```java
 public class Solution {
-    private boolean[][] visited;
-    
+    private int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
     public int numIslands(char[][] grid) {
         if (grid == null || grid.length == 0 || grid[0].length == 0) {
             return 0;
         }
         
         int res = 0;
-        visited = new boolean[grid.length][grid[0].length];
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[0].length; j++) {
-                if (grid[i][j] == '1' && !visited[i][j]) {
+                if (grid[i][j] == '1') {
                     res++;
                     dfs(grid, i, j);
                 }
@@ -3388,15 +3408,14 @@ public class Solution {
     }
     
     private void dfs (char[][] grid, int row, int col) {
-        if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length || grid[row][col] == '0' || visited[row][col]) {
+        if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length || grid[row][col] == '0') {
             return;
         }
         
-        visited[row][col] = true;
-        dfs(grid, row + 1, col);
-        dfs(grid, row - 1, col);
-        dfs(grid, row, col + 1);
-        dfs(grid, row, col - 1);
+        grid[row][col] = '0';
+        for (int[] d : directions) {
+            dfs(grid, row + d[0], col + d[1]);
+        }
     }
 }
 ```
@@ -3418,7 +3437,6 @@ public class Solution {
 
 ```java
 public class Solution {
-    // 解法一
     public ListNode reverseList(ListNode head) {
         ListNode dummy = new ListNode(0);
         while (head != null) {
@@ -3428,16 +3446,6 @@ public class Solution {
             head = next;
         }
         return dummy.next;
-    }
-	// 解法二
-        public ListNode reverseList(ListNode head) {
-        if (head == null || head.next == null) {
-            return head;
-        }
-        ListNode newHead = reverseList(head.next);
-        head.next.next = head;
-        head.next = null;
-        return newHead;
     }
 }
 ```
@@ -3636,14 +3644,43 @@ public class Trie {
 ```java
 public class Solution {
     public int findKthLargest(int[] nums, int k) {
-        Queue<Integer> queue = new PriorityQueue<>(Comparator.reverseOrder());
-        for (int num : nums) {
-            queue.offer(num);
+        int l = 0, r = nums.length - 1;
+        k = nums.length - k;
+        while (l < r) {
+            int p = partition(nums, l, r);
+            if (p == k) {
+                return nums[k];
+            } else if (p < k) {
+                l = p + 1;
+            } else {
+                r = p - 1;
+            }
         }
-        for (int i = 1; i < k; i++) {
-            queue.poll();
+        return nums[k];
+    }
+
+    private int partition(int[] nums, int start, int end) {
+        int temp = nums[start];
+        int i = start, j = end;
+        while (i < j) {
+            while (i < j && nums[j] > temp) {
+                j--;
+            }
+            while (i < j && nums[i] <= temp) {
+                i++;
+            }
+            if (i < j) {
+                swap(nums, i, j);
+            }
         }
-        return queue.peek();
+        swap(nums, start, i);
+        return i;
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
     }
 }
 ```
@@ -3895,10 +3932,6 @@ public class Solution {
 ```java
 public class Solution {
     public int[] productExceptSelf(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return null;
-        }
-        
         int[] res = new int[nums.length];
         for (int i = 0, product = 1; i < nums.length; i++) {
             res[i] = product;
@@ -3948,30 +3981,24 @@ public class Solution {
 ```java
 public class Solution {
     public int[] maxSlidingWindow(int[] nums, int k) {
-        if (nums == null || nums.length == 0 || k > nums.length) {
-            return new int[0];
+        if(nums.length < 2) {
+            return nums;
         }
-        
-        int[] res = new int[nums.length - k + 1];
-        LinkedList<Integer> queue = new LinkedList<>();
-        for (int i = 0; i < k - 1; i++) {
-            while (!queue.isEmpty() && nums[queue.peekLast()] < nums[i]) {
+        LinkedList<Integer> queue = new LinkedList();
+        int[] result = new int[nums.length - k + 1];
+        for(int i = 0; i < nums.length; i++){
+            while(!queue.isEmpty() && nums[queue.peekLast()] <= nums[i]){
                 queue.pollLast();
             }
-            queue.offerLast(i);
-        }
-        
-        for (int i = k - 1; i < nums.length; i++) {
-            while (!queue.isEmpty() && nums[queue.peekLast()] < nums[i]) {
-                queue.pollLast();
+            queue.addLast(i);
+            if(queue.peek() <= i - k){
+                queue.poll();
+            } 
+            if(i + 1 >= k){
+                result[i + 1 - k] = nums[queue.peek()];f
             }
-            queue.offerLast(i);
-            if (i - queue.peekFirst() >= k) {
-                queue.pollFirst();
-            }
-            res[i - k + 1] = nums[queue.peekFirst()];
         }
-        return res;
+        return result;
     }
 }
 ```
@@ -4058,12 +4085,11 @@ public class Solution {
 public class Solution {
     public int numSquares(int n) {
         int[] dp = new int[n + 1];
-        Arrays.fill(dp, Integer.MAX_VALUE);
+        Arrays.fill(dp, n);
         for (int i = 1; i * i <= n; i++) {
             dp[i * i] = 1;
         }
-        
-        for (int i = 1; i < n; i++) {
+        for (int i = 2; i <= n; i++) {
             for (int j = 0; j * j + i <= n; j++) {
                 dp[i + j * j] = Math.min(dp[i + j * j], dp[i] + 1);
             }
@@ -4094,17 +4120,12 @@ public class Solution {
 ```java
 public class Solution {
     public void moveZeroes(int[] nums) {
-        if (nums == null) {
-            return;
-        }
-        
         int k = 0;
         for (int num : nums) {
             if (num != 0) {
                 nums[k++] = num;
             }
         }
-        
         for (int i = k; i < nums.length; i++) {
             nums[i] = 0;
         }
@@ -4197,33 +4218,28 @@ public class Solution {
 public class Codec {
     private int index = -1;
 
-    // Encodes a tree to a single string.
     public String serialize(TreeNode root) {
         if (root == null) {
-            return "#,";
+            return "#!";
         }
         
-        StringBuilder sb = new StringBuilder();
-        sb.append(root.val).append(',').append(serialize(root.left)).append(serialize(root.right));
-        return sb.toString();
+        return new StringBuilder().append(root.val).append('!').append(serialize(root.left)).append(serialize(root.right)).toString();
     }
 
-    // Decodes your encoded data to tree.
     public TreeNode deserialize(String data) {
         if (data == null) {
             return null;
         }
-        return helper(data.split(","));
+        return deserialize(data.split("!"));
     }
     
-    private TreeNode helper(String[] strs) {
-        index++;
-        if ("#".equals(strs[index])) {
+    private TreeNode deserialize(String[] strs) {
+        if ("#".equals(strs[++index])) {
             return null;
         }
         TreeNode node = new TreeNode(Integer.valueOf(strs[index]));
-        node.left = helper(strs);
-        node.right = helper(strs);
+        node.left = deserialize(strs);
+        node.right = deserialize(strs);
         return node;
     }
 }
@@ -4251,25 +4267,34 @@ public class Codec {
 **Solution：**
 
 ```java
-public class Solution {
+class Solution {
     public int lengthOfLIS(int[] nums) {
-        if (nums == null || nums.length == 0) {
-            return 0;
+        if (nums.length < 2) {
+            return nums.length;
         }
-        
-        // dp[i]表示以nums中第i个元素结尾的最长上升子序列长度
-        int[] dp = new int[nums.length];
-        int res = 1;
-        Arrays.fill(dp, 1);
-        for (int i = 0; i < nums.length; i++) {
-            for (int j = 0; j <= i; j++) {
-                if (nums[i] > nums[j]) {
-                    dp[i] = Math.max(dp[j] + 1, dp[i]);
-                    res = Math.max(res, dp[i]);
-                }
+        int[] tails = new int[nums.length];
+        int len = 0;
+        for (int num : nums) {
+            int index = binarySearch(tails, len, num);
+            tails[index] = num;
+            if (index == len) {
+                len++;
             }
         }
-        return res;
+        return len;
+    }
+    
+    private int binarySearch(int[] tails, int len, int target) {
+        int l = 0, r = len;
+        while (l < r) {
+            int m = l + r >> 1;
+            if (tails[m] < target) {
+                l = m + 1;
+            } else {
+                r = m;
+            }
+        }
+        return l;
     }
 }
 ```
@@ -4394,18 +4419,14 @@ public class Solution {
 ```java
 public class Solution {
     public int coinChange(int[] coins, int amount) {
-        if (coins == null || coins.length == 0 || amount < 0) {
-            return -1;
-        }
-        
-        int res = 0;
-        int[] dp = new int[amount + 1];
+        int dp[] = new int[amount + 1];
+        Arrays.sort(dp);
         for (int i = 1; i <= amount; i++) {
             dp[i] = amount + 1;
-            for (int j = 0; j < coins.length; j++) {
-                if (i >= coins[j]) {
-                    dp[i] = Math.min(dp[i], dp[i - coins[j]] + 1);
-                }
+            for (int coin : coins) {
+                if (i >= coin) {
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                } 
             }
         }
         return dp[amount] > amount ? -1 : dp[amount];
@@ -4583,30 +4604,31 @@ s = "2[abc]3[cd]ef", 返回 "abcabccdcdcdef".
 
 ```java
 public class Solution {
-    private int i = 0;
-    
     public String decodeString(String s) {
-        if (s == null || s.length() == 0) {
-            return "";
+        StringBuilder res = new StringBuilder();
+        int multi = 0;
+        Stack<Integer> stackMulti = new Stack<>();
+        Stack<String> stackRes = new Stack<>();
+        for (Character c : s.toCharArray()) {
+            if (c == '[') {
+                stackMulti.push(multi);
+                stackRes.push(res.toString());
+                multi = 0;
+                res = new StringBuilder();
+            } else if (c == ']') {
+                StringBuilder tmp = new StringBuilder();
+                int curMulti = stackMulti.pop();
+                for (int i = 0; i < curMulti; i++) {
+                    tmp.append(res);
+                }
+                res = new StringBuilder(stackRes.pop()).append(tmp);
+            } else if (c >= '0' && c <= '9') {
+                multi = multi * 10 + c - '0';
+            } else {
+                res.append(c);
+            }
         }
-        
-        StringBuilder sb = new StringBuilder();
-        for (; i < s.length() && s.charAt(i) != ']'; i++) {
-            if ((s.charAt(i) >= 'a' && s.charAt(i) <= 'z') || (s.charAt(i) >= 'A' && s.charAt(i) <= 'Z')) {
-                sb.append(s.charAt(i));
-                continue;
-            }
-            int count = 0;
-            while (s.charAt(i) <= '9' && s.charAt(i) >= '0') {
-                count = count * 10 + s.charAt(i++) - '0';
-            }
-            i++; // 越过'['或
-            String temp = decodeString(s);
-            while (count-- > 0) {
-                sb.append(temp);
-            }
-        }
-        return sb.toString();
+        return res.toString();
     }
 }
 ```
@@ -4872,20 +4894,23 @@ public class Solution {
 public class Solution {
     public List<Integer> findDisappearedNumbers(int[] nums) {
         List<Integer> res = new ArrayList<>();
-        if (nums == null || nums.length == 0) {
-            return res;
-        }
         for (int i = 0; i < nums.length; i++) {
-            if (nums[Math.abs(nums[i]) - 1] > 0) {
-                nums[Math.abs(nums[i]) - 1] *= -1;
+            while (nums[i] != (i + 1) && nums[nums[i] - 1] != nums[i]) {
+                swap(nums, i, nums[i] - 1);
             }
         }
+        
         for (int i = 0; i < nums.length; i++) {
-            if (nums[i] > 0) {
+            if (nums[i] != i + 1) {
                 res.add(i + 1);
             }
         }
         return res;
+    }
+    private void swap(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
     }
 }
 ```
@@ -4922,10 +4947,10 @@ public class Solution {
 public class Solution {
     public int hammingDistance(int x, int y) {
         int res = 0;
-        int temp =  x ^ y;
-        while (temp != 0) {
-            res += temp & 1;
-            temp >>>= 1;
+        int t = x ^ y;
+        while (t != 0) {
+            t &= (t - 1);
+            res++;
         }
         return res;
     }
@@ -4966,22 +4991,29 @@ public class Solution {
 
 ```java
 public class Solution {
-    private int res = 0;
-    
     public int findTargetSumWays(int[] nums, int S) {
-        helper(nums, 0, S);
-        return res;
+        int sum = getSum(nums);
+        int w = sum + S;
+        if (sum < S || (w & 1) == 1) {
+            return 0;
+        }
+        w >>= 1;
+        int[] dp = new int[w + 1];
+        dp[0] = 1;
+        for (int num : nums) {
+            for (int i = w; i >= num; i--) {
+                dp[i] += dp[i - num];
+            }
+        }
+        return dp[w];
     }
     
-    private void helper(int[] nums, int index, int S) {
-        if (index == nums.length) {
-            if (S == 0) {
-                res++;
-            }
-            return;
+    private int getSum(int[] nums) {
+        int res = 0;
+        for (int n : nums) {
+            res += n;
         }
-        helper(nums, index + 1, S - nums[index]);
-        helper(nums, index + 1, S + nums[index]);
+        return res;
     }
 }
 ```
@@ -5009,27 +5041,19 @@ public class Solution {
 **Solution：**
 
 ```java
-/**
- * 按照 右子树 -> 根节点 ->  左子树 的顺序遍历，统计之前节点值的和，加到当前节点上
- */
 public class Solution {
     public TreeNode convertBST(TreeNode root) {
-        if (root == null) {
-            return null;
-        }
-
-        int sum = 0;
         Stack<TreeNode> stack = new Stack<>();
         TreeNode node = root;
+        int sum = 0;
         while (!stack.isEmpty() || node != null) {
             while (node != null) {
                 stack.push(node);
                 node = node.right;
             }
             node = stack.pop();
-            int val = node.val;
             node.val += sum;
-            sum += val;
+            sum = node.val;
             node = node.left;
         }
         return root;
@@ -5230,28 +5254,23 @@ public class Solution {
 ```java
 public class Solution {
     public int findUnsortedSubarray(int[] nums) {
-        if (nums == null || nums.length < 2) {
-            return 0;
-        }
-        
         int min = nums[nums.length - 1];
         int max = nums[0];
-        int start = 0;
+        int begin = 0;
         int end = -1;
-        for (int i = 1; i < nums.length; i++) {
-            if (max > nums[i]) {
-                end = i;
-            } else {
-                max = nums[i];
-            }
-            
-            if (min < nums[nums.length - i - 1]) {
-                start = nums.length - i - 1;
-            } else {
-                min = nums[nums.length - i - 1];
+        for (int i = nums.length - 2; i >= 0; i--) {
+            min = Math.min(min, nums[i]);
+            if (nums[i] > min) {
+                begin = i;
             }
         }
-        return end - start + 1;
+        for (int i = 1; i < nums.length; i++) {
+            max = Math.max(max, nums[i]);
+            if (nums[i] < max) {
+                end = i;
+            }
+        }
+        return end - begin + 1;
     }
 }
 ```
@@ -5337,7 +5356,7 @@ public class Solution {
     private int res = 0;
 
     public int countSubstrings(String s) {
-        if (s == null || s.length() < 1) {
+        if (s.length() == 0) {
             return 0;
         }
 

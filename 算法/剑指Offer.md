@@ -1112,12 +1112,9 @@ public class Solution {
         for (int i = 1; i < array.length; i++) {
             if (res == array[i]) {
                 count++;
-            } else {
-                count--;
-                if (count == 0) {
-                    res = array[i];
-                    count = 1;
-                }
+            } else if (--count == 0) {
+                res = array[i];
+                count = 1;
             }
         }
         count = 0;
