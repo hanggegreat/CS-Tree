@@ -10,10 +10,6 @@
 
 [cyc题目](./算法/cyc题目.md)
 
-## 面经解析
-
-[阿里篇](面经/阿里/README.md)
-
 ## Java
 
 [Spring](Java/Spring/README.md)
