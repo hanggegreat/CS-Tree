@@ -1,4 +1,4 @@
-1.  安装 `docker` 和 `docker-compose`
+1.  安装 `docker` 和 `docker-compose`，保证机器有至少 `16g` 内存
 
 2.  创建 `docker-compose.yaml`文件，内容如下：
 
@@ -87,7 +87,58 @@
 
 3.  进入 `docker-compose.yaml` 同级目录
 
-4.  执行 `docker-compose up -d`命令
+4.  递归创建目录 `data/logstash/conf`
 
-5.  如果遇到容器启动失败，请手动调整 `docker` 内存资源大小 
+5.  进入 `data/logstash/conf` 目录，创建 `logstash.conf` 文件，内容如下：
+
+    ``` json
+    input {
+      file {
+        path => "/usr/share/logstash/data/movies.csv"
+        start_position => "beginning"
+        sincedb_path => "/dev/null"
+      }
+    }
+    filter {
+      csv {
+        separator => ","
+        columns => ["id","content","genre"]
+      }
+    
+      mutate {
+        split => { "genre" => "|" }
+        remove_field => ["path", "host","@timestamp","message"]
+      }
+    
+      mutate {
+        split => ["content", "("]
+        add_field => { "title" => "%{[content][0]}"}
+        add_field => { "year" => "%{[content][1]}"}
+      }
+    
+      mutate {
+        convert => {
+          "year" => "integer"
+        }
+        strip => ["title"]
+        remove_field => ["path", "host","@timestamp","message","content"]
+      }
+    
+    }
+    output {
+       elasticsearch {
+         hosts => "http://es01:9200"
+         index => "movies"
+         document_id => "%{id}"
+       }
+      stdout {}
+    }
+    
+    ```
+
+6.  进入 `docker-compose.yaml` 同级目录
+
+7.  执行 `docker-compose up -d` 命令启动 `elk` 
+
+8.  如果遇到容器启动失败，请手动调整 `docker` 内存资源大小 
 
