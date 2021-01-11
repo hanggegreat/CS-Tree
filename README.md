@@ -1,6 +1,6 @@
 ## 算法
 
-[排序等常见算法](算法/基础算法.md)
+[基础算法](算法/基础算法.md)
 
 [剑指Offer](./算法/剑指Offer.md)
 
@@ -9,6 +9,10 @@
 [bytedance题目](./算法/bytedance.md)
 
 [cyc题目](./算法/cyc题目.md)
+
+### 操作系统
+
+[Linux](./操作系统/Linux.md)
 
 ## Java
 

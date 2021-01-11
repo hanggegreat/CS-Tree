@@ -1,0 +1,2 @@
+Pod 是 Kubernetes 项目中最小的 API 对象，也即 Kubernetes 项目的原子调度单位。
+
