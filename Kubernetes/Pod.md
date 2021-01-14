@@ -344,3 +344,39 @@ rack="rack-22"
 zone="us-est-coast"
 ```
 
+**Service Account** 就是 Kubernetes 系统内置的一种“服务账户”，它是 Kubernetes 进行权限分配的对象。Service Account 的授权信息和文件，保存在它所绑定的一个特殊的 Secret 对象里的。这个特殊的 Secret 对象，就叫作 **ServiceAccountToken**。任何运行在 Kubernetes 集群上的应用，都必须使用这个 ServiceAccountToken 里保存的授权信息，才可以合法地访问 API Server。Kubernetes 有一个默认“服务账户”（default Service Account），每一个 Pod 都会自动声明一个类型是 Secret、名为 default-token-xxxx 的 Volume，然后自动挂载在每个容器的一个固定目录上。所以任何一个运行在 Kubernetes 里的 Pod，都可以直接使用，且无需显示地声明挂载它。
+
+### 容器健康检查和恢复机制
+
+在 Kubernetes 中，可以为 Pod 里的容器定义一个健康检查“探针”（Probe）。这样，kubelet 就会根据这个 Probe 的返回值决定这个容器的状态，而不是直接以容器镜像是否运行作为依据。这是生产环境中保证应用健康存活的重要手段：
+
+``` yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: test-liveness-exec
+spec:
+  containers:
+  - name: liveness
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
+```
+
+在上面这个 Pod 中，容器 liveness 在启动之后做的第一件事，就是在 /tmp 目录下创建了一个 healthy 文件，以此作为自己已经正常运行的标志。30 s 后把这个文件删除掉。livenessProbe（健康检查）的类型是 exec，它会在容器启动后，在容器里面执行一条我们指定的命令，比如：“cat /tmp/healthy”。这时，如果这个文件存在，这条命令的返回值就是 0，Pod 就会认为这个容器不仅已经启动，而且是健康的。这个健康检查，在容器启动 5 s 后开始执行（initialDelaySeconds: 5），每 5 s 执行一次（periodSeconds: 5）。
+
+Kubernetes 的 Pod 恢复机制，也叫 restartPolicy。它是 Pod 的 `pod.spec.restartPolicy` 字段，默认值是 Always：任何时候容器发生了异常，一定会被重建。
+
+Pod 的恢复过程，永远都是发生在当前节点上，一旦一个 Pod 与一个节点（Node）绑定，除非 `pod.spec.node` 被修改，否则它永远都不会离开这个节点。
+
